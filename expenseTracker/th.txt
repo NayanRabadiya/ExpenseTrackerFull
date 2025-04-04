@@ -1,0 +1,55 @@
+
+
+
+more tasks to do
+
+--edit page for expense
+--budget plannig module
+
+backend
+--all apis
+--processing
+
+
+data dictionary
+
+role:
+    roleid
+    role
+
+user:(account)
+    id          PK
+    Name
+    email
+    password
+    contact
+    address(optional)
+    roleid          FK
+
+category
+    id              Pk
+    categoryy
+
+expense
+    id              PK
+    title
+    categoryid      FK
+    date
+    description
+    amount
+    userid          FK
+
+budget(optional)
+    id               PK
+    monthly amount(total)
+    amount(category wise)
+    userid           FK
+
+state:
+    id
+    Name
+
+city:
+    id
+    Name
+    stateid

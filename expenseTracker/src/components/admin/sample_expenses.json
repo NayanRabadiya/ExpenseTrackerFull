@@ -1,0 +1,177 @@
+[
+  {
+    "amount": 1400,
+    "date": "02/01/2025",
+    "title": "Supermarket Groceries",
+    "categoryId": "67c80c4dbd663ed7aa4374cd",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Monthly grocery shopping for home essentials"
+  },
+  {
+    "amount": 1100,
+    "date": "06/01/2025",
+    "title": "Electricity and Water Bill",
+    "categoryId": "67c80c55bd663ed7aa4374ce",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+  },
+  {
+    "amount": 700,
+    "date": "09/01/2025",
+    "title": "Bike Fuel",
+    "categoryId": "67c859b3b53a28fd7027b09b",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Fuel refilled twice this month due to extra travel"
+  },
+  {
+    "amount": 900,
+    "date": "15/01/2025",
+    "title": "Doctor Visit & Medication",
+    "categoryId": "67c859bbb53a28fd7027b09c",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "General health check-up and prescriptions"
+  },
+  {
+    "amount": 1600,
+    "date": "20/01/2025",
+    "title": "Concert and Movies",
+    "categoryId": "67d791297b6707fec05d6d44",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Concert tickets and movie night with friends"
+  },
+  {
+    "amount": 1800,
+    "date": "25/01/2025",
+    "title": "Clothing Shopping",
+    "categoryId": "67d791767b6707fec05d6d45",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Bought winter clothes"
+  },
+  {
+    "amount": 1600,
+    "date": "28/01/2025",
+    "title": "Weekend Trip & Misc Expenses",
+    "categoryId": "67c859c6b53a28fd7027b09d",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 1500,
+    "date": "02/02/2025",
+    "title": "Supermarket Shopping",
+    "categoryId": "67c80c4dbd663ed7aa4374cd",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 900,
+    "date": "07/02/2025",
+    "title": "Utility Bills",
+    "categoryId": "67c80c55bd663ed7aa4374ce",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 850,
+    "date": "11/02/2025",
+    "title": "Public Transport Fares",
+    "categoryId": "67c859b3b53a28fd7027b09b",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Train and bus fares for commuting"
+  },
+  {
+    "amount": 1100,
+    "date": "14/02/2025",
+    "title": "Medical Checkup",
+    "categoryId": "67c859bbb53a28fd7027b09c",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Regular doctor visit and new prescription"
+  },
+  {
+    "amount": 1800,
+    "date": "18/02/2025",
+    "title": "Concert Night and Dinner",
+    "categoryId": "67d791297b6707fec05d6d44",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Attended a music event and had dinner with friends"
+  },
+  {
+    "amount": 2200,
+    "date": "22/02/2025",
+    "title": "Gadget Shopping",
+    "categoryId": "67d791767b6707fec05d6d45",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Bought new headphones and accessories"
+  },
+  {
+    "amount": 1700,
+    "date": "26/02/2025",
+    "title": "Weekend Travel & Misc Expenses",
+    "categoryId": "67c859c6b53a28fd7027b09d",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 1800,
+    "date": "02/03/2025",
+    "title": "Groceries and Home Supplies",
+    "categoryId": "67c80c4dbd663ed7aa4374cd",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Purchased extra household items"
+  },
+  {
+    "amount": 1200,
+    "date": "06/03/2025",
+    "title": "Utility Bills - Electricity & Internet",
+    "categoryId": "67c80c55bd663ed7aa4374ce",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 950,
+    "date": "10/03/2025",
+    "title": "Transportation Costs",
+    "categoryId": "67c859b3b53a28fd7027b09b",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  },
+  {
+    "amount": 1300,
+    "date": "14/03/2025",
+    "title": "Healthcare & Prescriptions",
+    "categoryId": "67c859bbb53a28fd7027b09c",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Medical checkup and necessary medications"
+  },
+  {
+    "amount": 2000,
+    "date": "18/03/2025",
+    "title": "Subscription & Movie Nights",
+    "categoryId": "67d791297b6707fec05d6d44",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Monthly streaming subscriptions and two movie outings"
+  },
+  {
+    "amount": 2500,
+    "date": "22/03/2025",
+    "title": "Fashion Shopping",
+    "categoryId": "67d791767b6707fec05d6d45",
+    "userId": "67c9a969b58237ab60054f33",
+    "description": "Bought a jacket and casual wear"
+  },
+  {
+    "amount": 1900,
+    "date": "26/03/2025",
+    "title": "Miscellaneous Weekend Expenses",
+    "categoryId": "67c859c6b53a28fd7027b09d",
+    "userId": "67c9a969b58237ab60054f33",
+    "description":""
+
+  }
+]

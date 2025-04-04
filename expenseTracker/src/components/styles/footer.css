@@ -1,0 +1,22 @@
+.footer {
+    background: #00897b;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+    margin-top: auto;
+    /* position: relative; */
+    /* left: 0; */
+    /* bottom: 0; */
+    /* right: 0; */
+    /* box-sizing: border-box; */
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /* Prevents horizontal scrolling */
+    overflow-x: hidden; 
+  }
+  

@@ -1,0 +1,177 @@
+/* General Styling for Profile Page */
+.profile-container {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4; /* Light background color */
+  padding-top: 7rem; /* Push content below the navbar */
+}
+
+.profile-card {
+  background-color: #ffffff; /* White background for profile card */
+  padding: 2rem;
+  border-radius: 0.6rem; /* Soft rounded corners */
+  box-shadow: 0 0.6rem 1.1rem rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 36rem; /* Increase width */
+  height: max-content;
+  max-width: 100%; /* Ensure it does not overflow on smaller screens */
+  text-align: center;
+  margin-top: 1.6rem;
+}
+
+/* Title styling */
+.title {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+/* Profile Form Styling */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  padding: 1rem;
+}
+
+
+
+
+
+/* Labels for inputs */
+.profile-form label {
+  text-align: left;
+  font-weight: bold;
+  margin: 0.5rem 0 0.2rem;
+  color: #555;
+}
+
+/* Input Fields */
+.profile-form input {
+  width: 98%;
+  padding: 0.8rem;
+  border-radius: 0.2rem; /* Rounded corners for modern look */
+  font-size: 1rem;
+  border: 0.1rem solid #ccc;
+  background-color: #f9f9f9;
+  transition: border 0.3s ease;
+}
+
+/* Focus effect for inputs */
+.profile-form input:focus {
+  border-color: #688569; /* Green focus effect */
+  outline: none;
+}
+/* Textarea Styling */
+.profile-form textarea {
+  width: 98%;
+  padding: 0.8rem;
+  border: 0.1rem solid #ccc;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  background: white;
+}
+
+
+/* Profile Photo Section */
+.profile-photo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.6rem;
+}
+
+.profile-photo img {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.8rem;
+  border: 0.2rem solid #f4f4f4; /* Subtle border */
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect on profile image */
+.profile-photo img:hover {
+  transform: scale(1.05); /* Slight scaling on hover */
+}
+
+/* File Input Customization */
+.profile-photo input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.upload-btn {
+  display: inline-block;
+  background-color: #00897b; /* Button color */
+  color: white;
+  padding: 0.6rem 1.6rem;
+  margin: auto;
+  font-size: 1rem;
+  border-radius: 2rem; /* Rounded button for modern look */
+  cursor: pointer;
+  text-align: center;
+  margin-top: 0.6rem;
+  font-weight: 600;
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect on upload button */
+.upload-btn:hover {
+  background-color: #619791;
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Focus effect on upload button */
+.upload-btn:focus {
+  outline: none;
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Button Styling */
+.btn {
+  padding: 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  margin-top: 1.6rem;
+}
+
+.btn-update {
+  background-color: #00897b; /* Green update button */
+  color: white;
+}
+
+.btn-update:hover {
+  background-color: #619791;
+}
+
+.btn-logout {
+  background-color: #f44336; /* Red logout button */
+  color: white;
+  margin-top: 1.3rem;
+}
+
+.btn-logout:hover {
+  background-color: #e53935;
+}
+
+/* Responsive Fix for smaller screens */
+@media (max-width: 700px) {
+  .profile-form textarea {
+    min-height: 5rem; /* Reduce height for small screens */
+  }
+  .profile-card {
+    width: 80%; /* Expand width on small screens */
+    padding: 1.5rem;
+  }
+
+  .profile-photo {
+    margin-bottom: 1.3rem;
+  }
+}

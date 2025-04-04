@@ -1,0 +1,90 @@
+/* Fullscreen Overlay - Freezes UI */
+.confirm-toast-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050; /* Ensures it is above everything */
+    pointer-events: auto; /* Ensures it captures all clicks */
+}
+
+/* Confirm Toast Box */
+.confirm-toast-wrapper {
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1051;
+    position: relative;
+}
+
+/* Message Text */
+.confirm-toast-wrapper p {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* Buttons Container */
+.confirm-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 10px;
+    gap: 15px;
+}
+
+/* Common Button Styling */
+.confirm-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s ease-in-out, transform 0.2s;
+}
+
+/* Yes Button */
+.confirm-btn.yes {
+    background: #00897b;
+    color: white;
+}
+
+.confirm-btn.yes:hover {
+    background: #00695c;
+    transform: scale(1.05);
+}
+
+/* No Button */
+.confirm-btn.no {
+    background: #f44336;
+    color: white;
+}
+
+.confirm-btn.no:hover {
+    background: #c62828;
+    transform: scale(1.05);
+}
+
+/* Prevent Scrolling When Modal is Open */
+body.freeze-ui {
+    overflow: hidden;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 400px) {
+    .confirm-toast-wrapper {
+        width: 90%;
+        padding: 15px;
+    }
+}

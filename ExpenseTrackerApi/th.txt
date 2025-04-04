@@ -1,0 +1,45 @@
+
+commands
+
+venv\Scripts\activate
+uvicorn main:app --reload
+
+
+data dictionary
+
+
+
+
+1)role:  done
+    id
+    name
+    description
+2)user:   done
+    id          PK
+    Name
+    email
+    password
+    contact
+    address(optional)
+    roleid          FK
+
+                
+5)category
+    id              Pk
+    name
+6)expense
+    id              PK
+    amount
+    category_id      FK
+    date
+    description
+    title
+    userid          FK
+
+
+7) budget
+    id               PK
+    category id      FK
+    amount
+    userid           FK
+

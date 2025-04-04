@@ -1,0 +1,265 @@
+.budget-container {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding-top: 7rem;
+}
+
+.budget-card {
+  height: max-content;
+  background: white;
+  padding: 2rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 0.3rem 0.8rem rgba(0, 0, 0, 0.1);
+  width: 40rem;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.budget-inputs {
+  /* border: 0.1rem solid red; */
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.budget-input-row {
+  width: 70%;
+  display: flex;
+  justify-content: center;
+  height: 2rem;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+}
+
+
+label {
+  text-align: left;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+  display: block;
+}
+
+.category-label {
+  width: 30%;
+  font-weight: bold;
+}
+
+.budget-card input {
+  width: 70%;
+  padding: 0.6rem;
+  border: 0.1rem solid #278393;
+  box-shadow: inset 0 0.1rem 0.3rem rgba(0, 0, 0, 0.2);
+  border-radius: 0.4rem;
+  font-size: 1rem;
+  background: white;
+}
+
+
+
+.info-card {
+  margin-top: 1.6rem;
+  background: #f0f8ff;
+  border-left: 0.4rem solid #1976d2;
+  padding: 1.2rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.1);
+}
+
+.info-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1976d2;
+  margin-bottom: 0.4rem;
+}
+
+.info-text {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+
+.empty-state {
+  background-color: #f7e3e3;
+  border-radius: 0.6rem;
+  padding: 1.6rem;
+  text-align: center;
+  margin-bottom: 1.6rem;
+  border-left: 0.4rem solid #da5e5e;
+
+  box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.1);
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #804040;
+  margin-bottom: 0.6rem;
+}
+
+.empty-message {
+  font-size: 1rem;
+  color: #666;
+}
+
+
+
+.total-budget-card {
+  background-color: #daf0cb;
+  border-radius: 0.6rem;
+  padding: .5rem;
+  text-align: center;
+  margin: 1rem auto;
+  border-left: 0.4rem solid #338f43;
+
+  box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.1);
+}
+
+.total-budget-card h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #235c2d;
+}
+
+.total-budget-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #097122;
+}
+
+
+.amount-input {
+  width: 8rem;
+}
+
+.submit-btn {
+  background-color: #3e3f8f;
+  color: white;
+  font-size: 1.2rem;
+  border: none;
+  padding: 0.8rem 1.1rem;
+  border-radius: 0.4rem;
+  width: 40%;
+  margin: auto;
+}
+
+.submit-btn:hover {
+  background-color: #353679;
+  /* Darker green on hover */
+}
+
+
+.category-selector {
+  width: 50%;
+  gap: 0.4rem;
+  margin: 1.1rem auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-selector label {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.category-selector select {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  border: 0.1rem solid #ccc;
+  border-radius: 0.4rem;
+  text-align: center;
+}
+
+
+
+.input-error {
+  border: 0.1rem solid red !important;
+  box-shadow: 0 0 0.1rem red;
+  outline: none;
+}
+
+/* Error message inside the border */
+.error-message {
+  position: absolute;
+  top: -0.8rem;
+  left: 35%;
+  background: white;
+  color: red;
+  font-size: 0.8rem;
+  padding: 0 0.4rem;
+  font-weight: bold;
+}
+
+
+
+/* .category-selector select:focus {
+    border-color: #c7d3e0;
+    outline: none;
+  } */
+
+
+
+
+
+
+
+@media (max-width: 800px) {
+  .budget-card {
+    width: 85%;
+    padding: 1.5rem;
+  }
+
+  .amount-input {
+    width: 100%;
+  }
+  
+  .budget-input-row {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .category-label {
+    width: 30%;
+  }
+  
+  .budget-card input {
+    width: 40%;
+    font-size: 0.8rem;
+  }
+
+  .error-message {
+    position: absolute;
+    top: -0.8rem;
+    left: 50%;
+    background: white;
+    color: red;
+    font-size: 0.8rem;
+    padding: 0 0.4rem;
+    font-weight: bold;
+  }
+  
+  
+}
