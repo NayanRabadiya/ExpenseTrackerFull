@@ -32,7 +32,6 @@ async def addUserWithUrl(
     roleId: str,
     image: UploadFile,
 ):
-    """🔥 API to add a user with an uploaded image file"""
 
     try:
         # file_ext = image.filename.split(".")[-1]
@@ -137,7 +136,9 @@ async def getUserByRoleId(roleId: str):
 
 
 async def loginUser(req: UserLogin):
-    foundUser = await user_collection.find_one({"email": req.email, "roleId": ObjectId('67c7e9367afd6879270eb871')})
+    foundUser = await user_collection.find_one(
+        {"email": req.email, "roleId": ObjectId("67c7e9367afd6879270eb871")}
+    )
     print(".....user", foundUser)
     if foundUser is None:
         return JSONResponse(status_code=404, content={"message": "user not found"})
@@ -146,36 +147,72 @@ async def loginUser(req: UserLogin):
         req.password.encode(), foundUser["password"].encode()
     ):
         foundUser = await getRoleData(foundUser)
-        
-        return JSONResponse(status_code=200, content=UserOut(**foundUser).dict())
-    else:
-        return JSONResponse(status_code=401, content={"message": "incorrect password"})
-    
-    
-async def loginAdmin(req: UserLogin):
-    foundUser = await user_collection.find_one({"email": req.email, "roleId": ObjectId('67c7e9207afd6879270eb870')})
-    print(".....user", foundUser)
-    if foundUser is None:
-        return JSONResponse(status_code=404, content={"message": "user not found"})
-    print("........password", type(foundUser["password"]))
-    if "password" in foundUser and bcrypt.checkpw(
-        req.password.encode(), foundUser["password"].encode()
-    ):
-        foundUser = await getRoleData(foundUser)
-        
+
         return JSONResponse(status_code=200, content=UserOut(**foundUser).dict())
     else:
         return JSONResponse(status_code=401, content={"message": "incorrect password"})
 
-async def getRoleData(user):
-    if "roleId" in user:
-        # print("........role id",user["roleId"])
-        role = await role_collection.find_one({"_id": ObjectId(user["roleId"])})
-        # print("........role",role)
-        user["role"] = {"name": role["name"]}
+
+async def loginAdmin(req: UserLogin):
+    foundUser = await user_collection.find_one(
+        {"email": req.email, "roleId": ObjectId("67c7e9207afd6879270eb870")}
+    )
+    print(".....user", foundUser)
+    if foundUser is None:
+        return JSONResponse(status_code=404, content={"message": "user not found"})
+    print("........password", type(foundUser["password"]))
+    if "password" in foundUser and bcrypt.checkpw(
+        req.password.encode(), foundUser["password"].encode()
+    ):
+        foundUser = await getRoleData(foundUser)
+
+        return JSONResponse(status_code=200, content=UserOut(**foundUser).dict())
     else:
-        user["role"] = None
-    return user
+        return JSONResponse(status_code=401, content={"message": "incorrect password"})
+
+
+async def updateUser(
+    id: str,
+    name: str,
+    email: str,
+    contact: str,
+    address: Optional[str],
+    roleId: str,
+    image: Optional[UploadFile],
+):
+
+    try:
+        if image:
+            imageURL = await uploadImage(image.file)
+            if not imageURL:
+                raise HTTPException(status_code=500, detail="Image upload failed!")
+            user_data = {
+                "name": name,
+                "email": email,
+                "contact": contact,
+                "address": address,
+                "roleId": ObjectId(roleId),
+                "imgUrl": imageURL,
+            }
+        else:
+            user_data = {
+                "name": name,
+                "email": email,
+                "contact": contact,
+                "address": address,
+                "roleId": ObjectId(roleId),
+            }
+
+        result = await user_collection.update_one(
+            {"_id": ObjectId(id)}, {"$set": user_data}
+        )
+
+        updatedUser = await user_collection.find_one({"_id": ObjectId(id)})
+        updatedUser = await getRoleData(updatedUser)
+
+        return JSONResponse(status_code=200, content=UserOut(**updatedUser).dict())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
 SECRET_KEY = "expense"
@@ -217,7 +254,9 @@ async def resetPassword(data: ResetPasswordReq):
         if not email:
             raise HTTPException(status_code=421, detail="token is not valid...")
 
-        hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        hashed_password = bcrypt.hashpw(
+            data.password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
         await user_collection.update_one(
             {"email": email}, {"$set": {"password": hashed_password}}
         )
@@ -227,3 +266,14 @@ async def resetPassword(data: ResetPasswordReq):
         raise HTTPException(status_code=403, detail="jwt is expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="jwt is invalid")
+
+
+async def getRoleData(user):
+    if "roleId" in user:
+        # print("........role id",user["roleId"])
+        role = await role_collection.find_one({"_id": ObjectId(user["roleId"])})
+        # print("........role",role)
+        user["role"] = {"name": role["name"]}
+    else:
+        user["role"] = None
+    return user

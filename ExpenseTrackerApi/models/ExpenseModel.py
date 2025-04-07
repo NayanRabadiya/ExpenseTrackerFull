@@ -1,8 +1,10 @@
-from pydantic import BaseModel,Field,validator
+from pydantic import BaseModel,Field,validator,ConfigDict
 from typing import List,Optional,Dict,Any
 from bson import ObjectId
 
 class Expenses(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     amount:float
     date:str
     description:Optional[str]
@@ -22,6 +24,8 @@ class Expenses(BaseModel):
         return v
     
 class ExpensesOut(Expenses):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     id:str = Field(alias="_id")
     category:Optional[Dict[str,Any]] = None
     user:Optional[Dict[str,Any]] = None
@@ -43,4 +47,6 @@ class ExpensesOut(Expenses):
         if isinstance(v,ObjectId):
             return str(v)
         return v
+    
+    
         

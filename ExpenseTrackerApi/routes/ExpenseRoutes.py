@@ -20,3 +20,7 @@ async def addExpense(expense:Expenses):
 @router.delete("/expense/{id}")
 async def deleteExpenseById(id:str):
     return await ExpenseController.deleteExpenseById(id)
+
+@router.put("/expense/{id}")
+async def update_expense(id: str, data: Expenses):
+    return await ExpenseController.updateExpense(id, data)

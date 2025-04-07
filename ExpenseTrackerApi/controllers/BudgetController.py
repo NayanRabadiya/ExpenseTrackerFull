@@ -67,6 +67,30 @@ async def deleteBudget(id: str):
     else:
         raise HTTPException(status_code=404, detail=f"Budget with id {id} not found")
 
+async def updateBudget(id: str, budget: Budget):
+    
+    try:
+        budget.categoryId = ObjectId(budget.categoryId)
+        budget.userId = ObjectId(budget.userId)
+    
+        result = await budget_collection.update_one({"_id": ObjectId(id)}, {"$set": budget.dict()})
+
+        updatedBudget = await budget_collection.find_one({"_id": ObjectId(id)})
+        updateBudget = await getCategoryData(updatedBudget)
+        updateBudget = await getUserData(updateBudget)
+        
+        return JSONResponse(status_code=200, content=BudgetOut(**updatedBudget).dict())
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating Budget: {str(e)}")
+
+
+    
+    
+    
+    
+
+
 
 async def getUserData(budget):
     if "userId" in budget:

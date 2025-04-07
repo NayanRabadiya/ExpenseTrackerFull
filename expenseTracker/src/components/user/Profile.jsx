@@ -34,27 +34,27 @@ export const Profile = () => {
   //  Handle form submission
   const handleSaveClick = async () => {
     try {
+      console.log("userData", userData);
       const formData = new FormData();
+      
+      formData.append("name", userData.name);
+      formData.append("email", userData.email);
+      formData.append("contact", userData.contact);
+      formData.append("address", userData.address);
+      formData.append("roleId", userData.roleId);
+      // formData.append("image", selectedFile);
   
-      // Append user data
-      Object.keys(userData).forEach((key) => {
-        formData.append(key, userData[key]);
-      });
-  
-      // Append the image file
       if (selectedFile) {
         formData.append("image", selectedFile);
       }
-  
-      // ✅ Debugging: Check FormData values
+
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
+      
+      const res = await axios.put(`/user/${userData.id}`, formData);
   
-      //  API Call
-      const res = await axios.post("/user/url", formData);
-  
-      // console.log("Response:", res.data);
+      console.log("Response:", res.data);
   
       //  Check if API returns the new image URL
       if (res.data.imgUrl) {

@@ -19,3 +19,7 @@ async def addBudget(budget:Budget):
 @router.delete("/budget/{id}")
 async def deleteBudget(id:str):
     return await BudgetController.deleteBudget(id)
+
+@router.put("/budget/{id}")
+async def updateBudget(id:str,budget:Budget):   
+    return await BudgetController.updateBudget(id,budget)

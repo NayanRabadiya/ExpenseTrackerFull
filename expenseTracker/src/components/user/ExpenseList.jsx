@@ -11,7 +11,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { ConfirmToast } from "../common/ConfirmToast";
 import { useNavigate } from "react-router-dom";
-import { Edit, Save, Delete, TextFields, Numbers, Label } from "@mui/icons-material";
+import { Edit, Save, Delete, TextFields, Numbers, Label, Cancel } from "@mui/icons-material";
 import { set } from "react-hook-form";
 
 
@@ -25,6 +25,7 @@ export const ExpenseList = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editingExpense, setEditingExpense] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
 
   const [categories, setCategories] = useState([]);
@@ -35,32 +36,58 @@ export const ExpenseList = () => {
     fetchExpenses();
   }, []);
 
-  const ddmmyyyyToDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
-    return new Date(year, month - 1, day);
+  const toDate = (date) => {
+    if (date instanceof Date) return date;
+
+    if (typeof date !== "string") return null;
+
+    // Normalize delimiters
+    const parts = date.includes("/") ? date.split("/") : date.includes("-") ? date.split("-") : [];
+
+    if (parts.length == 3) {
+      let day, month, year;
+
+      if (date.includes("/")) {
+        [day, month, year] = parts;
+      } else if (date.includes("-")) {
+        // If format is yyyy-mm-dd
+        if (parts[0].length == 4) {
+          [year, month, day] = parts;
+        } else {
+          [day, month, year] = parts;
+        }
+      }
+
+      return new Date(Number(year), Number(month) - 1, Number(day));
+    }
+    return null;
   };
 
 
   const toDDMMYYYY = (date) => {
-    const [year, month, day] = date.split("-");
-    return `${day}/${month}/${year}`;
+
+    const parsed = toDate(date);
+    if (!(parsed instanceof Date) || isNaN(parsed)) return "";
+    return `${String(parsed.getDate()).padStart(2, "0")}/${String(parsed.getMonth() + 1).padStart(2, "0")}/${parsed.getFullYear()}`;
   };
 
   const toYYYYMMDD = (date) => {
-    if (!(date instanceof Date)) return "";
+    const parsed = toDate(date);
+    if (!(parsed instanceof Date) || isNaN(parsed)) return "";
 
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
   };
+
 
   useEffect(() => {
     let filtered = [...expensesData];
-    if (dateRange.start) filtered = filtered.filter(expense => ddmmyyyyToDate(expense.date) >= ddmmyyyyToDate(dateRange.start));
-    if (dateRange.end) filtered = filtered.filter(expense => ddmmyyyyToDate(expense.date) <= ddmmyyyyToDate(dateRange.end));
-    if (amountRange.min) filtered = filtered.filter(expense => expense.amount >= amountRange.min);
-    if (amountRange.max) filtered = filtered.filter(expense => expense.amount <= amountRange.max);
+    if (dateRange.start) filtered = filtered.filter(expense => toDate(expense.date) >= toDate(dateRange.start));
+    if (dateRange.end) filtered = filtered.filter(expense => toDate(expense.date) <= toDate(dateRange.end));
+    if (amountRange.min) filtered = filtered.filter(expense => expense.amount >= parseFloat(amountRange.min));
+    if (amountRange.max) filtered = filtered.filter(expense => expense.amount <= parseFloat(amountRange.max));
     if (selectedCategories.length > 0) filtered = filtered.filter(expense => selectedCategories.includes(expense.category.name));
 
-    filtered.sort((a, b) => ddmmyyyyToDate(b.date) - ddmmyyyyToDate(a.date));
+    filtered.sort((a, b) => toDate(b.date) - toDate(a.date));
     setFilteredExpenses(filtered);
 
     if ((page - 1) * rowsPerPage >= filtered.length) {
@@ -97,6 +124,15 @@ export const ExpenseList = () => {
     }
   };
 
+  const handleEditing = (expense) => {
+    setEditingExpense(expense);
+    setEditingId(expense._id);
+  }
+
+  const handleClose = ()=>{
+    setEditingExpense(null);
+    setEditingId(null);
+  }
 
 
 
@@ -134,6 +170,7 @@ export const ExpenseList = () => {
   //     });
   //   });
   // };
+
   const handleDeleteExpense = async (expenseId) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
 
@@ -150,17 +187,69 @@ export const ExpenseList = () => {
     } catch (error) {
       console.log("Error deleting expense:", error.response?.data || error.message);
       setFilteredExpenses(backupExpenses);
+
       setExpensesData(prev => [...prev, backupExpenses.find(expense => expense._id === expenseId)]);
     }
   };
 
+
+
+
   const handleSaveEdit = async (expenseId) => {
     if (editingExpense == null) return
 
-    console.log("editingExpense", editingExpense);
 
-    //api logic for edit in database here
-    setEditingExpense(null);
+    const updated = {
+      amount: editingExpense.amount,
+      date: editingExpense.date,
+      description: editingExpense.description,
+      title: editingExpense.title,
+      categoryId: editingExpense.categoryId,
+      userId: editingExpense.userId
+    }
+
+    console.log("updated", updated);
+
+
+
+    try {
+      // console.log("....data",data);
+      const response = await toast.promise(
+        axios.put(`/expense/${expenseId}`, updated),
+        {
+          pending: "Updating expense...",
+          success: "Expense updated successfully! 🎉",
+          error: "Failed to update expense! Please try again.",
+        }
+      )
+
+      // console.log("res",response.data);
+
+
+
+      setExpensesData(prev =>
+        prev.map(exp =>
+          exp._id === expenseId
+            ? { ...exp, ...response.data } // Merge carefully
+            : exp
+        )
+      );
+
+
+      const updatedList = expensesData.map(exp =>
+        exp._id == expenseId ? response.data : exp
+      )
+
+      localStorage.setItem("expenses", JSON.stringify(updatedList));
+      setEditingExpense(null);
+      setEditingId(null);
+
+    } catch (error) {
+      console.error("Error saving expense:", error);
+      setEditingExpense(null);
+      setEditingId(null);
+
+    }
   }
 
 
@@ -210,35 +299,61 @@ export const ExpenseList = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredExpenses?.slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage).map((expense) => (
-                    editingExpense?._id == expense._id ? (
-                      <TableRow key={expense._id} className={editingExpense?._id === expense._id ? "editing-row" : ""}>
+                  {filteredExpenses?.slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage).map((expense) => {
+
+                    return editingId === expense._id ? (
+                      <TableRow key={expense._id} className="editing-row">
                         <TableCell>
-                          <TextField label="Date" type="date" value={toYYYYMMDD(ddmmyyyyToDate(editingExpense.date))} className="editing-input"
-                            onChange={(e) => setEditingExpense({ ...editingExpense, date: toDDMMYYYY(e.target.value) })} />
+                          <TextField
+                            label="Date"
+                            type="date"
+                            value={toYYYYMMDD(editingExpense?.date)}
+                            className="editing-input"
+                            onChange={(e) =>
+                              setEditingExpense({
+                                ...editingExpense,
+                                date: toDDMMYYYY(e.target.value),
+                              })
+                            }
+                          />
                         </TableCell>
 
                         <TableCell>
-                          <TextareaAutosize type="text" value={editingExpense.title} className="editing-input textarea"
-                            onChange={(e) => setEditingExpense({ ...editingExpense, title: e.target.value })} />
+                          <TextareaAutosize
+                            value={editingExpense?.title}
+                            className="editing-input textarea"
+                            onChange={(e) =>
+                              setEditingExpense({ ...editingExpense, title: e.target.value })
+                            }
+                          />
                         </TableCell>
 
                         <TableCell>
-                          <TextField label="Amount" type="number" value={editingExpense.amount} className="editing-input"
-                            onChange={(e) => setEditingExpense({ ...editingExpense, amount: e.target.value })} />
+                          <TextField
+                            label="Amount"
+                            type="number"
+                            value={editingExpense?.amount}
+                            className="editing-input"
+                            onChange={(e) =>
+                              setEditingExpense({ ...editingExpense, amount: e.target.value })
+                            }
+                          />
                         </TableCell>
 
                         <TableCell>
                           <FormControl>
-
                             <InputLabel>Category</InputLabel>
                             <Select
                               className="editing-select"
-                              value={editingExpense.categoryId}
+                              value={editingExpense?.categoryId}
                               onChange={(e) =>
                                 setEditingExpense((prev) => ({
-                                  ...prev, categoryId: e.target.value,
-                                  category: { name: categories.find(cat => cat._id == e.target.value)?.name },
+                                  ...prev,
+                                  categoryId: e.target.value,
+                                  category: {
+                                    name: categories.find((cat) => cat._id === e.target.value)
+                                      ?.name,
+                                  },
                                 }))
                               }
                             >
@@ -247,51 +362,62 @@ export const ExpenseList = () => {
                                   {category.name}
                                 </MenuItem>
                               ))}
-
                             </Select>
                           </FormControl>
                         </TableCell>
 
                         <TableCell style={{ maxWidth: "1rem" }}>
-                          <TextareaAutosize type="text" value={editingExpense.description} className="editing-input textarea"
-                            onChange={(e) => setEditingExpense({ ...editingExpense, description: e.target.value })} />
+                          <TextareaAutosize
+                            value={editingExpense?.description}
+                            className="editing-input textarea"
+                            onChange={(e) =>
+                              setEditingExpense({
+                                ...editingExpense,
+                                description: e.target.value,
+                              })
+                            }
+                          />
                         </TableCell>
 
                         <TableCell>
-                          <IconButton onClick={() => { handleSaveEdit(expense._id) }} color="success">
+                          <IconButton onClick={() => handleSaveEdit(expense._id)} color="success">
                             <Save />
                           </IconButton>
-                          {/* <IconButton onClick={() => handleDeleteExpense(expense._id)}><Delete color="error" /></IconButton> */}
+                          <IconButton onClick={() => handleClose()} color="warning">
+                            <Cancel />
+                          </IconButton>
                         </TableCell>
-
                       </TableRow>
                     ) : (
                       <TableRow key={expense._id}>
-                        <TableCell style={{ width: "10%" }}>{expense.date}</TableCell>
-                        <TableCell style={{ width: "20%" }}>{expense.title}</TableCell>
-                        <TableCell style={{ width: "10%" }}>{expense.amount}</TableCell>
-                        <TableCell style={{ width: "10%" }}>{expense.category.name}</TableCell>
-                        <TableCell style={{ width: "35%" }}>{expense.description}</TableCell>
-                        <TableCell style={{ width: "15%" }}>
-                          <IconButton onClick={() => setEditingExpense(expense)} color="primary">
+                        <TableCell>{expense.date}</TableCell>
+                        <TableCell>{expense.title}</TableCell>
+                        <TableCell>{expense.amount}</TableCell>
+                        <TableCell>{expense.category.name}</TableCell>
+                        <TableCell>{expense.description}</TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => handleEditing(expense)} color="primary">
                             <Edit />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteExpense(expense._id)}><Delete color="error" /></IconButton>
+                          <IconButton onClick={() => handleDeleteExpense(expense._id)}>
+                            <Delete color="error" />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
-                    )
-                  ))}
+                    );
+                  })}
+
                 </TableBody>
               </Table>
             </TableContainer>
 
             {/* <TablePagination component="div" count={filteredExpenses.length} rowsPerPage={rowsPerPage} page={page} onPageChange={(event, newPage) => { setPage(newPage) }} rowsPerPageOptions={[4, 5, 7, 8, 10, 12, 15]} onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value))} /> */}
-            <div style={{ display: "flex", justifyContent: "right", alignItems:"center" , margin:"1rem"}} className = "pagination">
+            <div style={{ display: "flex", justifyContent: "right", alignItems: "center", margin: "1rem" }} className="pagination">
               {/* <TextField type="number" label="rows per page" value={rowsPerPage}  ></TextField> */}
-              <FormControl style={{width:"10%"}}>
+              <FormControl style={{ width: "10%" }}>
 
                 <InputLabel>rows per page</InputLabel>
-                <Select value={rowsPerPage} onChange={(event) => { setRowsPerPage(parseInt(event.target.value)) }} InputLabelProps={{ shrink: true }}>
+                <Select value={rowsPerPage} onChange={(event) => { setRowsPerPage(parseInt(event.target.value)) }} >
                   <MenuItem value="4">4</MenuItem>
                   <MenuItem value="5">5</MenuItem>
                   <MenuItem value="6">6</MenuItem>
@@ -300,7 +426,7 @@ export const ExpenseList = () => {
                   <MenuItem value="12">12</MenuItem>
                 </Select>
               </FormControl>
-              <Pagination count={Math.ceil(filteredExpenses.length / rowsPerPage)} page={page} onChange={(event, newPage) => { setPage(newPage) }} rowsPerPageOptions={[4, 5, 7, 8, 10, 12, 15]} color="primary" />
+              <Pagination count={Math.ceil(filteredExpenses.length / rowsPerPage)} page={page} onChange={(event, newPage) => { setPage(newPage) }} color="primary" />
             </div>
           </div>
           )}

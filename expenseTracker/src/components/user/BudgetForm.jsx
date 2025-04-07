@@ -7,7 +7,7 @@ import {
   Select,
   MenuItem
 } from "@mui/material";
-import { Edit, Save, Delete } from "@mui/icons-material";
+import { Edit, Save, Delete, Cancel } from "@mui/icons-material";
 import "../styles/BudgetForm.css";
 import axios from "axios";
 
@@ -37,6 +37,7 @@ export const BudgetForm = () => {
   const fetchAllBudgets = async () => {
     const formattedBudgets = localStorage.getItem("budgets")
     setLocalBudgets(formattedBudgets ? JSON.parse(formattedBudgets) : []);
+
     const totalBudget = localStorage.getItem("total_Budget")
     setTotalBudget(totalBudget ? parseInt(totalBudget) : 0);
   }
@@ -93,33 +94,67 @@ export const BudgetForm = () => {
 
 
   //still not ready
-  const handleSaveEdit = (id) => {
-    // if (editingBudget == null) return;
-    setLocalBudgets(localBudgets.map(budget =>
-      budget.categoryId == editingBudget.categoryId ? { ...budget, amount: editingBudget.amount } : budget
-    ));
+  const handleSaveEdit = async () => {
+    if (editingBudget == null) return
+
+    const userId = localStorage.getItem("userid");
+
+    const updated = {
+      amount: editingBudget.amount,
+      categoryId: editingBudget.categoryId,
+      userId: userId
+
+    }
+    console.log("updated", updated);
 
 
-    //api logic for edit in database here
+
+    try {
+      const response = await toast.promise(
+        axios.put(`/budget/${editingBudget.id}`, updated),
+        {
+          pending: "Updating budget...",
+          success: "budget updated successfully! 🎉",
+          error: "Failed to update budget! Please try again.",
+        }
+      );
+
+      console.log("res", response.data);
+
+      const updatedList = localBudgets.map(bud =>
+        bud.id === editingBudget.id ? { ...bud, ...response.data } : bud
+      );
+    
+      const newTotalBudget = updatedList.reduce((total, budget) => total + budget.amount, 0);
 
 
-    setEditingBudget(null);
-    toast.success("Budget updated!");
+      localStorage.setItem("budgets", JSON.stringify(updatedList));
+      setLocalBudgets(updatedList);
+      localStorage.setItem("total_Budget", newTotalBudget);
+      setTotalBudget(newTotalBudget);
+
+      setEditingBudget(null);
+
+    } catch (error) {
+      console.error("Error saving expense:", error);
+      setEditingBudget(null);
+
+    }
   };
 
-  const handleDelete = async (id, categoryName, categoryId, amount) => {
+  const handleDelete = async (bud) => {
     try {
-      const response = await axios.delete(`/budget/${id}`);
+      const response = await axios.delete(`/budget/${bud.id}`);
       if (response.status == 200) {
 
-        const afterDelete = localBudgets.filter(budget => budget.categoryId !== categoryId);
+        const afterDelete = localBudgets.filter(budget => budget.categoryId !== bud.categoryId);
         setLocalBudgets(afterDelete);
         localStorage.setItem("budgets", JSON.stringify(afterDelete));
 
-        const newTotalBudget = totalBudget - amount;
+        const newTotalBudget = totalBudget - bud.amount;
         setTotalBudget(newTotalBudget);
         localStorage.setItem("total_Budget", newTotalBudget);
-        toast.error(`Deleted budget for category: ${categoryName}`)
+        toast.error(`Deleted budget for category: ${bud.categoryName}`)
       }
     } catch (error) {
       toast.warn("Failed to delete budget. Please try again.");
@@ -150,30 +185,33 @@ export const BudgetForm = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {localBudgets?.map(({ id, categoryId, categoryName, amount }) => (
-                    <TableRow key={id}>
-                      <TableCell style={{ fontWeight: "bold" }}>{categoryName}</TableCell>
+                  {localBudgets?.map((budget) => (
+                    <TableRow key={budget.id}>
+                      <TableCell style={{ fontWeight: "bold" }}>{budget.categoryName}</TableCell>
                       <TableCell style={{ width: "10rem", fontWeight: "bold" }}>
-                        {editingBudget?.categoryId == categoryId ? (
+                        {editingBudget?.categoryId == budget.categoryId ? (
                           <input className="edit-input" type="number" value={editingBudget.amount}
                             onChange={(e) => setEditingBudget(prev => ({ ...prev, amount: e.target.value }))} />
                         ) : (
-                          `₹${amount}`
+                          `₹${budget.amount}`
                         )}
                       </TableCell>
-                      {editingBudget?.categoryId === categoryId ? (
+                      {editingBudget?.categoryId === budget.categoryId ? (
                         <TableCell>
-                          <IconButton onClick={() => { handleSaveEdit(id) }} color="success">
+                          <IconButton onClick={() => { handleSaveEdit(budget.id) }} color="success">
                             <Save />
+                          </IconButton>
+                          <IconButton onClick={() => setEditingBudget(null)} color="warning">
+                            <Cancel />
                           </IconButton>
                         </TableCell>
                       ) : (
                         <TableCell>
 
-                          <IconButton onClick={() => setEditingBudget({ id, categoryId, amount })} color="primary">
+                          <IconButton onClick={() => setEditingBudget(budget)} color="primary">
                             <Edit />
-                            <IconButton onClick={() => handleDelete(id, categoryName, categoryId, amount)} color="error"><Delete /></IconButton>
                           </IconButton>
+                          <IconButton onClick={() => handleDelete(budget)} color="error"><Delete /></IconButton>
                         </TableCell>
                       )}
                     </TableRow>

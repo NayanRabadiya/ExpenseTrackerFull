@@ -39,6 +39,20 @@ async def addUserWithUrl(
     return await UserController.addUserWithUrl(
         name, email, password, contact, address, roleId, image
     )
+    
+@router.put("/user/{id}")
+async def updateUser(
+    id: str,
+    name: str = Form(...),
+    email: str = Form(...),
+    contact: str = Form(...),
+    address: Optional[str] = Form(None),
+    roleId: str = Form(...),
+    image: Optional[UploadFile] = File(None)
+):
+    return await UserController.updateUser(
+        id, name, email, contact, address, roleId, image
+    )
 
 
 @router.delete("/user/{id}")

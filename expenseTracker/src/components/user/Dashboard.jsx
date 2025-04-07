@@ -30,6 +30,7 @@ export const Dashboard = () => {
 
       localStorage.setItem("budgets", JSON.stringify(formattedBudgets));
       localStorage.setItem("total_Budget",response.data?.total_Budget );
+      
       setbudgets(formattedBudgets);
       setTotalBudget(response.data?.total_Budget);
     } catch (error) {

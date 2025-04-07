@@ -50,8 +50,25 @@ async def deleteExpenseById(id:str):
     else:
         return JSONResponse(status_code=404,content={"message":f'Expense with id {id} not found'})
 
+async def updateExpense(id: str, updated_data: Expenses):
+    try:
+        # Convert IDs to ObjectId for DB query
+        updated_data.userId = ObjectId(updated_data.userId)
+        updated_data.categoryId = ObjectId(updated_data.categoryId)
 
+        result = await expenses_collection.update_one(
+            {"_id": ObjectId(id)},
+            {"$set": updated_data.dict()}
+        )
 
+        updated_expense = await expenses_collection.find_one({"_id": ObjectId(id)})
+        updated_expense = await getCategoryData(updated_expense)
+        updated_expense = await getUserData(updated_expense)
+
+        return JSONResponse(status_code=200, content=ExpensesOut(**updated_expense).dict())
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating expense: {str(e)}")
 
 
 
