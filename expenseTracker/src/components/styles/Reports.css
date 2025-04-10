@@ -59,7 +59,13 @@
   box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.2);
   text-align: center;
   min-width: 10rem;
+  min-height: 25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+
 
 
 
@@ -121,6 +127,17 @@ canvas {
 
 }
 
+.chart-wrapper {
+  width: 100%;
+  height: 25rem;
+  position: relative;
+}
+
+.report-card canvas {
+  width: 100% !important;
+  height: 25rem !important;
+}
+
 
 
 /* Summary Card */
@@ -140,8 +157,41 @@ canvas {
   font-weight: bold;
 }
 
+.btn-container{
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem auto;
+}
+.gen-pdf-btn{
+  padding: 0.8rem 1.1rem;
+  border: none;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.gen-pdf-btn:first-child{
+  background: #00897b;
+  color: white;
+}
+
+.gen-pdf-btn:last-child{
+  background: #4CAF50;
+  color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 700px) {
+
+  .chart-wrapper{
+    height: 20rem;
+  }
+  .report-card canvas{
+    width: 100% !important;
+    height: 20rem !important;
+  }
   
   .reports-header {
     flex-direction: column;
@@ -169,3 +219,34 @@ canvas {
     font-size: 1rem;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+/* This only applies during PDF export */
+.pdf-export {
+  width: 1000px !important;
+  max-width: none !important;
+  padding: 2rem;
+  background-color: white;
+  transform: scale(1);
+  font-size: 14px;
+}
+
+.pdf-export .reports-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.pdf-export .report-card canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 25rem;
+}
+

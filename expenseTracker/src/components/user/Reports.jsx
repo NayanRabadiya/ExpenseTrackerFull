@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { Pie, Bar } from "react-chartjs-2";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Chart } from "chart.js";
 import "chart.js/auto";
 import "../styles/Reports.css";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { render } from "react-dom";
+Chart.register(ChartDataLabels);
 
 export const Reports = () => {
+
+  const reportsRef = useRef(null);
   const today = new Date();
   const currentMonth = today.getMonth() + 1;
   const currentYear = today.getFullYear();
@@ -103,18 +113,144 @@ export const Reports = () => {
     datasets: [{
       label: "Amount Spent",
       data: chartDataValues,
-      backgroundColor: "#00897b"
+      backgroundColor: ["#00897b", "#ff9800", "#f44336", "#3f51b5", "#9c27b0", "#4caf50"]
     }],
   };
+
+  // const chartOptions = {
+  //   plugins: {
+  //     legend: { position: "bottom" },
+  //     datalabels: {
+  //       color: "#333",
+  //       anchor: "end",
+  //       align: "start",
+  //       offset: 4,
+  //       font: { weight: "bold" },
+  //       formatter: (value) => `₹${value}`,
+  //     },
+  //   },
+  //   responsive: true,
+  //   // maintainAspectRatio: false,
+  // };
+
   const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: "bottom" }
+      legend: {
+        position: "bottom",
+        labels: {
+          font: { size: 12 },
+        },
+      },
+      datalabels: {
+        color: "#333",
+        anchor: "end",
+        align: "start",
+        font: {
+          size: 10,
+          weight: "bold",
+        },
+        formatter: (value) => `₹${value}`,
+      },
     },
-    responsive: true
+    scales: {
+      x: {
+        ticks: {
+          font: { size: 10 },
+        },
+      },
+      y: {
+        ticks: {
+          font: { size: 10 },
+        },
+      },
+    },
   };
 
-  return (
-    <div className="reports-container">
+
+
+  const handleViewPdf = () => {
+
+    toast.promise(async () => {
+      const input = document.getElementById("pdf-capture");
+      input.classList.add("pdf-export");
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      const canvas = await html2canvas(input, {
+        scale: 2,
+        useCORS: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();  // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+
+      // Stretch image to fill entire A4 page
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      input.classList.remove("pdf-export"); // Remove fixed style
+
+      const blob = pdf.output("blob");
+      const url = URL.createObjectURL(blob);
+      window.open(url);
+    }, {
+      pending: "Generating PDF...",
+      success: "PDF generated successfully",
+      error: "Failed to generate PDF"
+    });
+
+
+  };
+
+
+
+  const handleExportPDF = async () => {
+    const input = document.getElementById("pdf-capture");
+    input.classList.add("pdf-export");
+    await new Promise(resolve => setTimeout(resolve, 200))
+
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();  // 210mm
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+
+    // Stretch image to fill entire A4 page
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    input.classList.remove("pdf-export"); // Remove fixed style
+
+    const blob = pdf.output("blob");
+
+    const formData = new FormData();
+    formData.append("pdf", blob, "report.pdf");
+
+    try {
+      const userId = localStorage.getItem("userid");
+      await toast.promise( axios.post(`/sendmail/${userId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),{
+        pending: "Sending In Mail...",
+        success: "Email is being sent please wait",
+        error: "Failed to send PDF"
+      })
+    } catch (error) {
+      console.error("Error sending PDF:", error);
+    }
+  };
+
+  return (<>
+    <div className="reports-container" ref={reportsRef} id="pdf-capture">
       <div className="reports-header">
         <h2 className="page-title">Reports for {months.find(m => m.value === selectedMonth)?.label}, {selectedYear}</h2>
         <div className="filters">
@@ -163,12 +299,15 @@ export const Reports = () => {
 
           <Card className="report-card">
             <h3 className="chart-title">Spending Distribution</h3>
-            {chartLabels.length ? <Pie data={pieData} options={chartOptions}/> : <p className="no-data">No data available</p>}
+            {chartLabels.length ? <Pie data={pieData} options={chartOptions} /> : <p className="no-data">No data available</p>}
           </Card>
 
           <Card className="report-card">
+
             <h3 className="chart-title">Spending Breakdown</h3>
-            {chartLabels.length ? <Bar data={barData} options={chartOptions}/> : <p className="no-data">No data available</p>}
+            <div className="chart-wrapper">
+              {chartLabels.length ? <Bar data={barData} options={chartOptions} /> : <p className="no-data">No data available</p>}
+            </div>
           </Card>
 
           <Card className="report-card summary-card">
@@ -181,5 +320,11 @@ export const Reports = () => {
         </div>) : "Loading.."
       }
     </div >
+    <div className="btn-container">
+      <button onClick={handleExportPDF} className="gen-pdf-btn">Send Report via Email</button>
+      <button onClick={handleViewPdf} className="gen-pdf-btn">View PDF</button>
+    </div>
+  </>
+
   );
 };

@@ -4,6 +4,7 @@ import { Edit, Delete, Save, Cancel } from "@mui/icons-material";
 import "../styles/categorymanager.css";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { ConfirmToast } from "../common/ConfirmToast";
 
 export const CategoryManager = () => {
 
@@ -69,7 +70,8 @@ export const CategoryManager = () => {
 
 
   const handleDeleteCategory = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this category")) return
+    if(! await ConfirmToast("Are you sure you want to delete this Category?")) return
+
     try {
       await toast.promise(
         axios.delete(`/category/${id}`), {

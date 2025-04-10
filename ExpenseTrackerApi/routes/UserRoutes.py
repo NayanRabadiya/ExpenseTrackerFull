@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,BackgroundTasks
 from controllers import UserController
 from models.UserModel import User, UserOut, UserLogin,ResetPasswordReq,ForgotPasswordReq
 from fastapi import File, Form, UploadFile, Depends
@@ -61,6 +61,11 @@ async def updateUserRole(id: str, user: User):
 @router.delete("/user/{id}")
 async def deleteUserById(id: str):
     return await UserController.deleteUserById(id)
+
+@router.post("/sendmail/{userId}")
+async def sendMail(userId: str,background_tasks: BackgroundTasks, pdf: UploadFile = File(...)):
+    print("....sending mail")
+    return await UserController.sendMail(userId,pdf,background_tasks)
 
 
 @router.post("/login/user")

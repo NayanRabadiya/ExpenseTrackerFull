@@ -9,7 +9,7 @@ import { ExpenseList } from "./components/user/ExpenseList";
 import { Home } from "./components/user/Home";
 import axios from "axios";
 import { Bounce, ToastContainer } from "react-toastify";
-import {BudgetForm} from "./components/user/BudgetForm";
+import { BudgetForm } from "./components/user/BudgetForm";
 import { AddSampleData } from "./components/admin/AddSampleData";
 import { ResetPassword } from "./components/common/ResetPassword";
 import { ForgotPassword } from "./components/common/ForgotPassword";
@@ -34,15 +34,17 @@ function App() {
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
-        closeOnClick={false}
+        closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
         theme="dark"
         transition={Bounce}
-        className={"toast-container"}/>
-        
+      />
+
+
+
       <Routes>
         {/* <Route path="/login/admin" element={<Login></Login>} /> */}
         <Route path="/" element={<Home></Home>} />
@@ -50,8 +52,8 @@ function App() {
         <Route path="/login/admin" element={<AdminLogin></AdminLogin>} />
         <Route path="/register" element={<Register></Register>} />
         <Route path="/sample" element={<AddSampleData></AddSampleData>} />
-        <Route path= "/resetpassword/:token" element={<ResetPassword></ResetPassword>}></Route>
-        <Route path= "/forgotpassword" element={<ForgotPassword></ForgotPassword>}></Route>
+        <Route path="/resetpassword/:token" element={<ResetPassword></ResetPassword>}></Route>
+        <Route path="/forgotpassword" element={<ForgotPassword></ForgotPassword>}></Route>
 
         {/* <Route></Route> */}
         <Route element={<PrivateAdminRoutes></PrivateAdminRoutes>}>

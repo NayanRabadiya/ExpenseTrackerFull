@@ -23,6 +23,7 @@ import "../styles/users.css"
 import axios from "axios";
 import { set } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ConfirmToast } from "../common/ConfirmToast";
 export const Users = () => {
   // Dummy User Data
   const usersk = [
@@ -109,7 +110,7 @@ export const Users = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?"))
+    if(! await ConfirmToast("Are you sure you want to delete this user?")) return
       try {
         await toast.promise(
           axios.delete(`/user/${userId}`), {

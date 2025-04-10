@@ -1,90 +1,121 @@
-/* Fullscreen Overlay - Freezes UI */
+/* Prevent scroll when confirm toast is active */
+body.freeze-ui {
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* 🔥 Outer Toastify toast container override */
+.override-confirm-toast {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  z-index: 1050 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 🔥 Body wrapper inside Toastify */
+.confirm-toast-body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+/* 🔥 Your full-screen overlay */
 .confirm-toast-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1050; /* Ensures it is above everything */
-    pointer-events: auto; /* Ensures it captures all clicks */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1051;
+  pointer-events: auto;
+  outline: none;
+
 }
 
-/* Confirm Toast Box */
+.confirm-toast-overlay:focus {
+  outline: none;
+}
+
+/* 🔥 The white confirmation box */
 .confirm-toast-wrapper {
-    background: white;
-    color: #333;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    width: 350px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1051;
-    position: relative;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  padding: 20px;
+  width: 20rem;
+  max-width: 90vw;
+  text-align: center;
+  z-index: 1052;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Message Text */
-.confirm-toast-wrapper p {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-/* Buttons Container */
+/* Buttons layout */
 .confirm-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin: 10px;
-    gap: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 1rem;
 }
 
-/* Common Button Styling */
 .confirm-btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background 0.2s ease-in-out, transform 0.2s;
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-/* Yes Button */
 .confirm-btn.yes {
-    background: #00897b;
-    color: white;
+  background-color: #00897b;
+  color: white;
 }
 
 .confirm-btn.yes:hover {
-    background: #00695c;
-    transform: scale(1.05);
+  background-color: #00695c;
+  transform: scale(1.05);
 }
 
-/* No Button */
 .confirm-btn.no {
-    background: #f44336;
-    color: white;
+  background-color: #f44336;
+  color: white;
 }
 
 .confirm-btn.no:hover {
-    background: #c62828;
-    transform: scale(1.05);
+  background-color: #c62828;
+  transform: scale(1.05);
 }
 
-/* Prevent Scrolling When Modal is Open */
-body.freeze-ui {
-    overflow: hidden;
+/* ❌ Kill all animations globally from Toastify */
+.Toastify__toast--enter,
+.Toastify__toast--exit,
+.Toastify__toast--animate {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
 }
 
-/* Responsive Tweaks */
-@media (max-width: 400px) {
-    .confirm-toast-wrapper {
-        width: 90%;
-        padding: 15px;
-    }
+button:focus-visible {
+  outline: 0.2rem solid #010d1a;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
 }

@@ -22,6 +22,8 @@ export const ExpenseForm = () => {
   const onSubmit = async (data) => {
 
     const [year, month, day] = data.date.split("-");
+    
+
     data.date = `${day}/${month}/${year}`;
     data.userId = localStorage.getItem("userid");
 

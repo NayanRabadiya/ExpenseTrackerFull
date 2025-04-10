@@ -8,7 +8,13 @@ from models.UserModel import (
 from models.RoleModel import RoleOut
 from models.ExpenseModel import ExpensesOut
 from typing import List, Optional
-from config.database import user_collection, role_collection, budget_collection, expenses_collection, category_collection
+from config.database import (
+    user_collection,
+    role_collection,
+    budget_collection,
+    expenses_collection,
+    category_collection,
+)
 from bson import ObjectId
 from fastapi import HTTPException, UploadFile, File, Form, Depends
 from fastapi.responses import JSONResponse
@@ -18,6 +24,7 @@ import os
 from utils.CloudinaryUtil import uploadImage
 import datetime
 import jwt
+from fastapi import BackgroundTasks
 
 
 UPLOAD_DIR = "uploads"
@@ -137,9 +144,7 @@ async def getUserByRoleId(roleId: str):
 
 
 async def loginUser(req: UserLogin):
-    foundUser = await user_collection.find_one(
-        {"email": req.email}
-    )
+    foundUser = await user_collection.find_one({"email": req.email})
     print(".....user", foundUser)
     if foundUser is None:
         return JSONResponse(status_code=404, content={"message": "user not found"})
@@ -231,28 +236,31 @@ async def updateUserRole(id: str, user: User):
 
 
 async def getAdminData():
-    noOfUsers = await user_collection.count_documents({"roleId": ObjectId("67c7e9367afd6879270eb871")})
-    
+    noOfUsers = await user_collection.count_documents(
+        {"roleId": ObjectId("67c7e9367afd6879270eb871")}
+    )
+
     expenses = await expenses_collection.find().to_list()
-    
-    
+
     #  expensesthis month
     currentExpenses = []
     for expense in expenses:
         # date = "dd/mm/yyyy"
         date = expense["date"]
-        [day,month,year] = date.split("/")
-        if int(year) == datetime.datetime.now().year and int(month) == datetime.datetime.now().month:
+        [day, month, year] = date.split("/")
+        if (
+            int(year) == datetime.datetime.now().year
+            and int(month) == datetime.datetime.now().month
+        ):
             currentExpenses.append(expense)
-    
-    
-    #total amount 
+
+    # total amount
     totalAmount = 0
     for expense in currentExpenses:
         amount = expense["amount"]
         totalAmount = totalAmount + amount
-    
-    #categorywise amount
+
+    # categorywise amount
     categoryAmount = {}
     for expense in currentExpenses:
         amount = expense["amount"]
@@ -263,7 +271,7 @@ async def getAdminData():
             categoryAmount[categoryName] = categoryAmount[categoryName] + amount
         else:
             categoryAmount[categoryName] = amount
-    
+
     # highest spending category
     highestSpendingCategory = None
     highestSpendingAmount = 0
@@ -271,14 +279,31 @@ async def getAdminData():
         if amount > highestSpendingAmount:
             highestSpendingCategory = category
             highestSpendingAmount = amount
-    
+
     # average monthly expense
     averageExpense = totalAmount / noOfUsers
+
+    return {
+        "noOfUsers": noOfUsers,
+        "totalAmount": totalAmount,
+        "highestSpendingCategory": highestSpendingCategory,
+        "highestSpendingAmount": highestSpendingAmount,
+        "averageExpensePerUser": averageExpense,
+        "categoryAmount": categoryAmount,
+        "currentExpenses": [ExpensesOut(**expense) for expense in currentExpenses],
+    }
+
+
+async def sendMail(userId:str, pdf: UploadFile, background_tasks: BackgroundTasks):
+    user = await user_collection.find_one({"_id": ObjectId(userId)})
+    email = user["email"]
     
-    return {"noOfUsers":noOfUsers,"totalAmount":totalAmount,"highestSpendingCategory":highestSpendingCategory,"highestSpendingAmount":highestSpendingAmount,"averageExpensePerUser":averageExpense,"categoryAmount":categoryAmount ,"currentExpenses":[ ExpensesOut(**expense) for expense in currentExpenses]}
+    pdf_bytes = pdf.file.read()
     
     
+    background_tasks.add_task(send_email, to_email=email, subject="Expense Report",text="Here is your expense report", pdf_data=pdf_bytes)
     
+    return JSONResponse(status_code=200, content={"message": "Email sent successfully"})
 
 
 SECRET_KEY = "expense"
@@ -344,12 +369,14 @@ async def getRoleData(user):
         user["role"] = None
     return user
 
+
 async def getCategoryData(expense):
     if "categoryId" in expense:
-        category = await category_collection.find_one({"_id":ObjectId(expense["categoryId"])})
+        category = await category_collection.find_one(
+            {"_id": ObjectId(expense["categoryId"])}
+        )
 
-        expense["category"] = {"name":category['name']}
+        expense["category"] = {"name": category["name"]}
     else:
         expense["category"] = None
     return expense
-

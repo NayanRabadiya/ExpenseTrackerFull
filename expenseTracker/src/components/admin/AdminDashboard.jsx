@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Pie, Bar } from "react-chartjs-2";
 import "../styles/AdminDashboard.css";
 import { Card } from "@mui/material";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Chart } from "chart.js";
+Chart.register(ChartDataLabels);
+
 
 import {
   Chart as ChartJS,
@@ -61,26 +65,77 @@ export const AdminDashboard = () => {
         data: chartDataValues,
         backgroundColor: COLORS,
       },
+
     ],
   };
 
   const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom",
+        labels: {
+          font: {
+            size: 12,
+          },
+        },
+      },
+      datalabels: {
+        color: "#333",
+        anchor: "end",
+        align: "end",
+        offset: 6,
+        font: {
+          weight: "bold",
+          size: 10,
+        },
+        formatter: (value) => `₹${value}`,
       },
     },
   };
-
+  
   const barOptions = {
-    responsive: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 12,
+          },
+        },
+      },
+      y: {
+        ticks: {
+          font: {
+            size: 12,
+          },
+        },
+      },
+    },
     plugins: {
       legend: {
         display: true,
         position: "top",
+        labels: {
+          font: {
+            size: 12,
+          },
+        },
+      },
+      datalabels: {
+        anchor: "end",
+        align: "top",
+        color: "#333",
+        font: {
+          size: 10,
+        },
+        formatter: (value) => `₹${value}`,
       },
     },
   };
+  
 
   return (
     <div className="dashboard-container">
@@ -108,19 +163,25 @@ export const AdminDashboard = () => {
       <div className="charts-container">
         <Card className="chart-card">
           <h3 className="chart-title">Spending Distribution by Category</h3>
+          <div className="chart-wrapper">
+
           {chartLabels.length ? (
-            <Pie data={pieData} options={pieOptions} />
+            <Pie data={pieData} options={pieOptions} plugins={ChartDataLabels} />
           ) : (
             <p className="no-data">No data available</p>
           )}
+          </div>
         </Card>
 
         <Card className="chart-card">
           <h3 className="chart-title">Categorywise Spending Trend</h3>
+          <div className="chart-wrapper">
+
           {chartLabels.length ? (
-            <Bar data={barData} options={barOptions} />) : (
-            <p className="no-data">No data available</p>
-          )}
+            <Bar data={barData} options={barOptions} plugins={ChartDataLabels} />) : (
+              <p className="no-data">No data available</p>
+            )}
+            </div>
         </Card>
       </div>
     </div>

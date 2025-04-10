@@ -129,50 +129,17 @@ export const ExpenseList = () => {
     setEditingId(expense._id);
   }
 
-  const handleClose = ()=>{
+  const handleClose = () => {
     setEditingExpense(null);
     setEditingId(null);
   }
 
+  const handleDeleteExpense = async (expenseId,title) => {
 
+    const confirm = await ConfirmToast(`Do you really want to delete ${title}?`)
+    console.log("confirm", confirm);
+    if (!confirm) return;
 
-  // const handleDeleteExpense = async (expenseId) => {
-  //   ConfirmToast("Are you sure you want to delete this expense?", async () => {
-  //     const backupExpenses = [...filteredExpenses];
-  //     const updatedExpenses = filteredExpenses.filter(expense => expense._id !== expenseId);
-  //     setFilteredExpenses(updatedExpenses);
-  //     setExpensesData(prev => prev.filter(expense => expense._id !== expenseId));
-
-  //     const totalPages = Math.ceil(updatedExpenses.length / rowsPerPage);
-  //     setPage(prevPage => (prevPage >= totalPages ? Math.max(0, totalPages - 1) : prevPage));
-
-  //     toast.promise(
-  //       axios.delete(`/expense/${expenseId}`).then((res) => {
-  //         if (res.status === 200) {
-  //           return "Expense deleted successfully! 🗑️";
-  //         } else {
-  //           throw new Error("Unexpected response status");
-  //         }
-  //       }),
-  //       {
-  //         pending: "Deleting expense...",
-  //         success: "Expense deleted successfully! 🗑️",
-  //         error: {
-  //           render({ data }) {
-  //             return data.response?.data?.message || "Failed to delete expense. Please try again.";
-  //           },
-  //         },
-  //       }
-  //     ).catch((error) => {
-  //       console.error("Error deleting expense:", error.response?.data || error.message);
-  //       setFilteredExpenses(backupExpenses);
-  //       setExpensesData(backupExpenses);
-  //     });
-  //   });
-  // };
-
-  const handleDeleteExpense = async (expenseId) => {
-    if (!window.confirm("Are you sure you want to delete this expense?")) return;
 
     const backupExpenses = [...filteredExpenses];
     const updatedExpenses = filteredExpenses.filter(expense => expense._id !== expenseId);
@@ -399,7 +366,7 @@ export const ExpenseList = () => {
                           <IconButton onClick={() => handleEditing(expense)} color="primary">
                             <Edit />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteExpense(expense._id)}>
+                          <IconButton onClick={() => handleDeleteExpense(expense._id,expense.title)}>
                             <Delete color="error" />
                           </IconButton>
                         </TableCell>

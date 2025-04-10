@@ -10,6 +10,7 @@ import {
 import { Edit, Save, Delete, Cancel } from "@mui/icons-material";
 import "../styles/BudgetForm.css";
 import axios from "axios";
+import { ConfirmToast } from "../common/ConfirmToast";
 
 export const BudgetForm = () => {
 
@@ -143,6 +144,8 @@ export const BudgetForm = () => {
   };
 
   const handleDelete = async (bud) => {
+    if (! await ConfirmToast(`Delete budget for category: ${bud.categoryName}`)) return
+
     try {
       const response = await axios.delete(`/budget/${bud.id}`);
       if (response.status == 200) {
