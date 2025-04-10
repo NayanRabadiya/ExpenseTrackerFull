@@ -10,7 +10,7 @@ const useAuth = () => {
     useEffect(() => {
         const id = localStorage.getItem("userid");
         const role = localStorage.getItem("role");
-        if (id && role == "User") {
+        if (id ) {
             setauth({ isLoggedin: true, role: role });
         }
         setisLoading(false);

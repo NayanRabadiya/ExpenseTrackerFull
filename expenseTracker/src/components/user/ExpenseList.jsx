@@ -301,7 +301,7 @@ export const ExpenseList = () => {
                 <TableBody>
                   {filteredExpenses?.slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage).map((expense) => {
 
-                    return editingId === expense._id ? (
+                    return editingId == expense._id ? (
                       <TableRow key={expense._id} className="editing-row">
                         <TableCell>
                           <TextField

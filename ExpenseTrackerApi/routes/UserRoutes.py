@@ -54,6 +54,9 @@ async def updateUser(
         id, name, email, contact, address, roleId, image
     )
 
+@router.put("/user/role/{id}")
+async def updateUserRole(id: str, user: User):
+    return await UserController.updateUserRole(id, user)
 
 @router.delete("/user/{id}")
 async def deleteUserById(id: str):
@@ -77,5 +80,11 @@ async def forgot_password(data:ForgotPasswordReq):
 @router.post("/resetpassword")
 async def reset_password(data:ResetPasswordReq):
     return await UserController.resetPassword(data)
+
+
+@router.get("/admindata")
+async def getAdminData():
+    return await UserController.getAdminData()
+
 
 

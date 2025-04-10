@@ -30,7 +30,7 @@ export const Login = () => {
     
     // console.log(response.data);
     
-    if (response.status == 200 && response.data?.role?.name == "User") {
+    if (response.status == 200 ) {
         localStorage.clear();
         localStorage.setItem("userData", JSON.stringify(response.data));
         localStorage.setItem("userid", response.data.id);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Profile.css";
+import { toast } from "react-toastify";
 
 export const Profile = () => {
   const navigate = useNavigate();
@@ -33,17 +34,23 @@ export const Profile = () => {
 
   //  Handle form submission
   const handleSaveClick = async () => {
+
+
+    if (!userData.name || !userData.contact) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     try {
       console.log("userData", userData);
       const formData = new FormData();
-      
+
       formData.append("name", userData.name);
       formData.append("email", userData.email);
       formData.append("contact", userData.contact);
       formData.append("address", userData.address);
       formData.append("roleId", userData.roleId);
       // formData.append("image", selectedFile);
-  
+
       if (selectedFile) {
         formData.append("image", selectedFile);
       }
@@ -51,31 +58,40 @@ export const Profile = () => {
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
-      
-      const res = await axios.put(`/user/${userData.id}`, formData);
-  
+
+
+      const res = await toast.promise(
+        axios.put(`/user/${userData.id}`, formData),
+        {
+          pending: "Updating your profile...",
+          success: "Profile updated successfully! 🎉",
+          error: "Failed to update profile. Please try again.",
+        }
+      )
+
       console.log("Response:", res.data);
-  
       //  Check if API returns the new image URL
       if (res.data.imgUrl) {
         setImage(res.data.imgUrl); // Update the displayed image
-        setUserData((prev) => ({ ...prev, imgUrl: res.data.imgUrl })); // Update userData
-        localStorage.setItem("userData", JSON.stringify({ ...userData, imgUrl: res.data.imgUrl })); // Store updated data
       }
-  
-      alert("Profile updated successfully!");
+      setUserData((prev) => ({ ...prev, ...res.data })); // Update userData
+      localStorage.setItem("userData", JSON.stringify({ ...userData, ...res.data })); // Store updated data
+
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
-  
+
 
   //  Handle logout
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login/user");
   };
+
+
+
 
   return (
     <div className="profile-container">

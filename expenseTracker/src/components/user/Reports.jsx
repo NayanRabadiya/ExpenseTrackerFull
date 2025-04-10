@@ -92,12 +92,25 @@ export const Reports = () => {
 
   const pieData = {
     labels: chartLabels,
-    datasets: [{ data: chartDataValues, backgroundColor: ["#00897b", "#ff9800", "#f44336", "#3f51b5", "#9c27b0", "#4caf50"] }],
+    datasets: [{
+      data: chartDataValues,
+      backgroundColor: ["#00897b", "#ff9800", "#f44336", "#3f51b5", "#9c27b0", "#4caf50"]
+    }],
   };
 
   const barData = {
     labels: chartLabels,
-    datasets: [{ label: "Amount Spent", data: chartDataValues, backgroundColor: "#00897b" }],
+    datasets: [{
+      label: "Amount Spent",
+      data: chartDataValues,
+      backgroundColor: "#00897b"
+    }],
+  };
+  const chartOptions = {
+    plugins: {
+      legend: { position: "bottom" }
+    },
+    responsive: true
   };
 
   return (
@@ -124,47 +137,48 @@ export const Reports = () => {
           </FormControl>
         </div>
       </div>
-      {isDataLoaded ? (<div className="reports-grid">
-        <Card className="report-card">
-          <h3 className="chart-title">Category-wise Spending</h3>
-          <table className="budget-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Amount Spent</th>
-                <th>Budget</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map(({ categoryName, spent, budget }, index) => (
-                <tr key={index}>
-                  <td>{categoryName}</td>
-                  <td style={{color: spent>budget ?"red":"green"}}>₹{spent}</td>
-                  <td>{budget === "-" ? "-" : `₹${budget}`}</td>
+      {isDataLoaded ? (
+        <div className="reports-grid">
+          <Card className="report-card">
+            <h3 className="chart-title">Category-wise Spending</h3>
+            <table className="budget-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Amount Spent</th>
+                  <th>Budget</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+              </thead>
+              <tbody>
+                {tableData.map(({ categoryName, spent, budget }, index) => (
+                  <tr key={index}>
+                    <td>{categoryName}</td>
+                    <td style={{ color: spent > budget ? "red" : "green" }}>₹{spent}</td>
+                    <td>{budget === "-" ? "-" : `₹${budget}`}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
 
-        <Card className="report-card">
-          <h3 className="chart-title">Spending Distribution</h3>
-          {chartLabels.length ? <Pie data={pieData} /> : <p className="no-data">No data available</p>}
-        </Card>
+          <Card className="report-card">
+            <h3 className="chart-title">Spending Distribution</h3>
+            {chartLabels.length ? <Pie data={pieData} options={chartOptions}/> : <p className="no-data">No data available</p>}
+          </Card>
 
-        <Card className="report-card">
-          <h3 className="chart-title">Spending Breakdown</h3>
-          {chartLabels.length ? <Bar data={barData} /> : <p className="no-data">No data available</p>}
-        </Card>
+          <Card className="report-card">
+            <h3 className="chart-title">Spending Breakdown</h3>
+            {chartLabels.length ? <Bar data={barData} options={chartOptions}/> : <p className="no-data">No data available</p>}
+          </Card>
 
-        <Card className="report-card summary-card">
-          <h3 className="chart-title">Summary</h3>
-          <p>Total Budget: <strong>₹{totalBudget}</strong></p>
-          <p>Total Spent: <strong>₹{totalSpent}</strong></p>
+          <Card className="report-card summary-card">
+            <h3 className="chart-title">Summary</h3>
+            <p>Total Budget: <strong>₹{totalBudget}</strong></p>
+            <p>Total Spent: <strong>₹{totalSpent}</strong></p>
 
-          {totalBudget - totalSpent >= 0 ? <p>Remaining: <strong style={{ color: "green" }}>₹{totalBudget - totalSpent}</strong></p> : <p style={{ color: "red" }}>Over Spent: <strong >₹{totalSpent - totalBudget}</strong></p>}
-        </Card>
-      </div>) : "Loading.."
+            {totalBudget - totalSpent >= 0 ? <p>Remaining: <strong style={{ color: "green" }}>₹{totalBudget - totalSpent}</strong></p> : <p style={{ color: "red" }}>Over Spent: <strong >₹{totalSpent - totalBudget}</strong></p>}
+          </Card>
+        </div>) : "Loading.."
       }
     </div >
   );

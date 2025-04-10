@@ -124,7 +124,7 @@ export const BudgetForm = () => {
       const updatedList = localBudgets.map(bud =>
         bud.id === editingBudget.id ? { ...bud, ...response.data } : bud
       );
-    
+
       const newTotalBudget = updatedList.reduce((total, budget) => total + budget.amount, 0);
 
 
@@ -185,18 +185,15 @@ export const BudgetForm = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {localBudgets?.map((budget) => (
-                    <TableRow key={budget.id}>
-                      <TableCell style={{ fontWeight: "bold" }}>{budget.categoryName}</TableCell>
-                      <TableCell style={{ width: "10rem", fontWeight: "bold" }}>
-                        {editingBudget?.categoryId == budget.categoryId ? (
+                  {localBudgets?.map((budget) => {
+
+                    return editingBudget?.categoryId == budget.categoryId ? (
+                      <TableRow key={budget.id}>
+                        <TableCell style={{ fontWeight: "bold" }}>{budget.categoryName}</TableCell>
+                        <TableCell style={{ width: "10rem", fontWeight: "bold" }}>
                           <input className="edit-input" type="number" value={editingBudget.amount}
                             onChange={(e) => setEditingBudget(prev => ({ ...prev, amount: e.target.value }))} />
-                        ) : (
-                          `₹${budget.amount}`
-                        )}
-                      </TableCell>
-                      {editingBudget?.categoryId === budget.categoryId ? (
+                        </TableCell>
                         <TableCell>
                           <IconButton onClick={() => { handleSaveEdit(budget.id) }} color="success">
                             <Save />
@@ -205,18 +202,22 @@ export const BudgetForm = () => {
                             <Cancel />
                           </IconButton>
                         </TableCell>
-                      ) : (
+                      </TableRow>
+                    ) : (
+                      <TableRow key={budget.id}>
+                        <TableCell style={{ fontWeight: "bold" }}>{budget.categoryName}</TableCell>
+                        <TableCell style={{ width: "10rem", fontWeight: "bold" }}>{`₹${budget.amount}`}</TableCell>
                         <TableCell>
-
                           <IconButton onClick={() => setEditingBudget(budget)} color="primary">
                             <Edit />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(budget)} color="error"><Delete /></IconButton>
+                          <IconButton onClick={() => handleDelete(budget)} color="error">
+                            <Delete />
+                          </IconButton>
                         </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-
+                      </TableRow>
+                    )
+                  })}
 
                 </TableBody>
               </Table>

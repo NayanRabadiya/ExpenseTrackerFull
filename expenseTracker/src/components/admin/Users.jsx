@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -17,12 +17,15 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, Save, Cancel } from "@mui/icons-material";
 import Pagination from "@mui/material/Pagination";
 import "../styles/users.css"
+import axios from "axios";
+import { set } from "react-hook-form";
+import { toast } from "react-toastify";
 export const Users = () => {
   // Dummy User Data
-  const dummyUsers = [
+  const usersk = [
     { _id: 1, name: "John Doe", email: "john@example.com", role: { name: "Admin" }, },
     { _id: 2, name: "Jane Smith", email: "jane@example.com", role: { name: "User" }, },
     { _id: 3, name: "Alice Johnson", email: "alice@example.com", role: { name: "User" }, },
@@ -36,17 +39,105 @@ export const Users = () => {
   ];
 
   const [search, setSearch] = useState("");
-  const [role, setRole] = useState("");
+  const [roles, setroles] = useState([]);
+  const [users, setusers] = useState([]);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [editingUser, seteditingUser] = useState(null);
+  const [filteredUsers, setfilteredUsers] = useState([]);
+  
   const [page, setPage] = useState(1);
-  const rowsPerPage = 3;
+  const rowsPerPage = 5;
+  
+  useEffect(() => {
+    fetchRoles();
+    fetchUsers();
+  }, []);
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("/roles");
+      console.log(response.data);
+      setroles(response.data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
-  // Filter users based on search and role
-  const filteredUsers = dummyUsers.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) &&
-      (role === "" || user.role.name === role)
-  );
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/users");
+      console.log(response.data);
+      setusers(response.data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }
 
+
+
+
+
+
+  const handleSaveEditingUser = async () => {
+    try {
+      console.log("editingUser", editingUser);
+
+      const res = await toast.promise(
+        axios.put(`/user/role/${editingUser._id}`, editingUser), {
+        pending: "Updating user... ",
+        success: "User updated successfully! 🎉",
+        error: "Failed to update user! Please try again.",
+      }
+      )
+
+      console.log("res", res.data);
+
+      const updatedUser = { ...res.data };
+      console.log("updatedUser", updatedUser);
+
+      setusers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id == updatedUser.id ? { ...user, "roleId": updatedUser.roleId, "role": updatedUser.role } : user
+        )
+      );
+
+    } catch (error) {
+      console.error("Error updating user:", error);
+    } finally {
+      seteditingUser(null);
+    }
+
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this user?"))
+      try {
+        await toast.promise(
+          axios.delete(`/user/${userId}`), {
+          pending: "Deleting user... ",
+          success: "User deleted successfully! 🎉",
+        })
+        setusers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+      }
+      catch (error) {
+        console.error("Error deleting user:", error);
+      }
+  }
+
+  useEffect(() => {
+    const loggedInUserId = localStorage.getItem("userid");
+    // Filter users based on search and role
+    setfilteredUsers(
+      users.filter(
+        (user) =>
+          user._id != loggedInUserId &&
+          (user.name.toLowerCase().includes(search.toLowerCase())
+            || user.email.toLowerCase().includes(search.toLowerCase())
+            || user.contact.toLowerCase().includes(search.toLowerCase())) &&
+          (selectedRoleId == "" || user.roleId == selectedRoleId)
+      ))
+
+      setPage(1);
+  }, [users, search, selectedRoleId]);
   // Pagination Logic
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -72,10 +163,13 @@ export const Users = () => {
           />
           <FormControl fullWidth className="filter-input">
             <InputLabel>Role</InputLabel>
-            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+            <Select value={selectedRoleId} onChange={(e) => setSelectedRoleId(e.target.value)}>
               <MenuItem value="">All</MenuItem>
-              <MenuItem value="Admin">Admin</MenuItem>
-              <MenuItem value="User">User</MenuItem>
+              {roles.map((role) => (
+                <MenuItem key={role._id} value={role._id}>
+                  {role.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </div>
@@ -87,28 +181,69 @@ export const Users = () => {
               <TableRow className="table-header">
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
+                <TableCell>Contact</TableCell>
                 <TableCell>Role</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((user) => (
-                <TableRow key={user._id}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role.name}</TableCell>
-                  <TableCell align="center" className="actions">
-                    <IconButton color="primary">
-                      <Edit />
-                    </IconButton>
+              {filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((user) => {
 
-                    <IconButton color="error" >
-                      
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+                return editingUser?._id === user._id ? (
+                  <TableRow key={user._id} className="editing-row">
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.contact}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={editingUser.roleId}
+                        onChange={(e) => seteditingUser(
+                          {
+                            ...editingUser,
+                            roleId: e.target.value,
+                            role: { "name": roles.find((role) => role._id === e.target.value).name }
+                          })}
+                      >
+                        {roles.map((role) => (
+                          <MenuItem key={role._id} value={role._id}>
+                            {role.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </TableCell>
+                    <TableCell align="center" className="actions">
+
+                      <IconButton color="success" onClick={handleSaveEditingUser}>
+                        <Save />
+                      </IconButton>
+
+                      <IconButton color="warning" onClick={() => seteditingUser(null)}>
+                        <Cancel />
+                      </IconButton>
+
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  <TableRow key={user._id}>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.contact}</TableCell>
+                    <TableCell>{user.role.name}</TableCell>
+                    <TableCell align="center" className="actions">
+
+                      <IconButton color="primary" onClick={() => seteditingUser(user)}>
+                        <Edit />
+                      </IconButton>
+
+                      <IconButton color="error" onClick={() => handleDeleteUser(user._id)}>
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>)
+
+
+
+              })}
               {filteredUsers.length == 0 && (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
@@ -125,7 +260,7 @@ export const Users = () => {
           <Pagination count={Math.ceil(filteredUsers.length / rowsPerPage)} page={page} onChange={handleChangePage} color="primary" />
         </div>
       </div>
-    </div>
+    </div >
 
   );
 };

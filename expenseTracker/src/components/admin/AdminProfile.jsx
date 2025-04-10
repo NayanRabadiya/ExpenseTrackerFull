@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Profile.css";
+import { toast } from "react-toastify";
 
 export const AdminProfile = () => {
   const navigate = useNavigate();
@@ -33,49 +34,64 @@ export const AdminProfile = () => {
 
   //  Handle form submission
   const handleSaveClick = async () => {
+
+
+    if (!userData.name || !userData.contact) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     try {
+      console.log("userData", userData);
       const formData = new FormData();
-  
-      // Append user data
-      Object.keys(userData).forEach((key) => {
-        formData.append(key, userData[key]);
-      });
-  
-      // Append the image file
+
+      formData.append("name", userData.name);
+      formData.append("email", userData.email);
+      formData.append("contact", userData.contact);
+      formData.append("address", userData.address);
+      formData.append("roleId", userData.roleId);
+      // formData.append("image", selectedFile);
+
       if (selectedFile) {
         formData.append("image", selectedFile);
       }
-  
-      // ✅ Debugging: Check FormData values
+
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
-  
-      //  API Call
-      const res = await axios.post("/user/url", formData);
-  
-      // console.log("Response:", res.data);
-  
+
+
+      const res = await toast.promise(
+        axios.put(`/user/${userData.id}`, formData),
+        {
+          pending: "Updating your profile...",
+          success: "Profile updated successfully! 🎉",
+          error: "Failed to update profile. Please try again.",
+        }
+      )
+
+      console.log("Response:", res.data);
       //  Check if API returns the new image URL
       if (res.data.imgUrl) {
         setImage(res.data.imgUrl); // Update the displayed image
-        setUserData((prev) => ({ ...prev, imgUrl: res.data.imgUrl })); // Update userData
-        localStorage.setItem("userData", JSON.stringify({ ...userData, imgUrl: res.data.imgUrl })); // Store updated data
       }
-  
-      alert("Profile updated successfully!");
+      setUserData((prev) => ({ ...prev, ...res.data })); // Update userData
+      localStorage.setItem("userData", JSON.stringify({ ...userData, ...res.data })); // Store updated data
+
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
-  
+
 
   //  Handle logout
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login/admin");
   };
+
+
+
 
   return (
     <div className="profile-container">

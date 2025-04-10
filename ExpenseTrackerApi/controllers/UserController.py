@@ -6,8 +6,9 @@ from models.UserModel import (
     ForgotPasswordReq,
 )
 from models.RoleModel import RoleOut
+from models.ExpenseModel import ExpensesOut
 from typing import List, Optional
-from config.database import user_collection, role_collection
+from config.database import user_collection, role_collection, budget_collection, expenses_collection, category_collection
 from bson import ObjectId
 from fastapi import HTTPException, UploadFile, File, Form, Depends
 from fastapi.responses import JSONResponse
@@ -137,7 +138,7 @@ async def getUserByRoleId(roleId: str):
 
 async def loginUser(req: UserLogin):
     foundUser = await user_collection.find_one(
-        {"email": req.email, "roleId": ObjectId("67c7e9367afd6879270eb871")}
+        {"email": req.email}
     )
     print(".....user", foundUser)
     if foundUser is None:
@@ -215,6 +216,71 @@ async def updateUser(
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
+async def updateUserRole(id: str, user: User):
+    try:
+        result = await user_collection.update_one(
+            {"_id": ObjectId(id)}, {"$set": {"roleId": ObjectId(user.roleId)}}
+        )
+
+        updatedUser = await user_collection.find_one({"_id": ObjectId(id)})
+        updatedUser = await getRoleData(updatedUser)
+
+        return JSONResponse(status_code=200, content=UserOut(**updatedUser).dict())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+
+async def getAdminData():
+    noOfUsers = await user_collection.count_documents({"roleId": ObjectId("67c7e9367afd6879270eb871")})
+    
+    expenses = await expenses_collection.find().to_list()
+    
+    
+    #  expensesthis month
+    currentExpenses = []
+    for expense in expenses:
+        # date = "dd/mm/yyyy"
+        date = expense["date"]
+        [day,month,year] = date.split("/")
+        if int(year) == datetime.datetime.now().year and int(month) == datetime.datetime.now().month:
+            currentExpenses.append(expense)
+    
+    
+    #total amount 
+    totalAmount = 0
+    for expense in currentExpenses:
+        amount = expense["amount"]
+        totalAmount = totalAmount + amount
+    
+    #categorywise amount
+    categoryAmount = {}
+    for expense in currentExpenses:
+        amount = expense["amount"]
+        expense = await getCategoryData(expense)
+        category = expense["category"]
+        categoryName = category["name"]
+        if categoryName in categoryAmount:
+            categoryAmount[categoryName] = categoryAmount[categoryName] + amount
+        else:
+            categoryAmount[categoryName] = amount
+    
+    # highest spending category
+    highestSpendingCategory = None
+    highestSpendingAmount = 0
+    for category, amount in categoryAmount.items():
+        if amount > highestSpendingAmount:
+            highestSpendingCategory = category
+            highestSpendingAmount = amount
+    
+    # average monthly expense
+    averageExpense = totalAmount / noOfUsers
+    
+    return {"noOfUsers":noOfUsers,"totalAmount":totalAmount,"highestSpendingCategory":highestSpendingCategory,"highestSpendingAmount":highestSpendingAmount,"averageExpensePerUser":averageExpense,"categoryAmount":categoryAmount ,"currentExpenses":[ ExpensesOut(**expense) for expense in currentExpenses]}
+    
+    
+    
+
+
 SECRET_KEY = "expense"
 
 
@@ -277,3 +343,13 @@ async def getRoleData(user):
     else:
         user["role"] = None
     return user
+
+async def getCategoryData(expense):
+    if "categoryId" in expense:
+        category = await category_collection.find_one({"_id":ObjectId(expense["categoryId"])})
+
+        expense["category"] = {"name":category['name']}
+    else:
+        expense["category"] = None
+    return expense
+

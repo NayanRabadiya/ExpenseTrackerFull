@@ -29,3 +29,10 @@ async def deleteCategoryById(id:str):
         return {"message":"Category deleted successfully"}
     else:
         raise HTTPException(status_code=404,content={"message":"Category with id {id} not found"})  
+
+async def updateCategory(id:str,category:Category):
+    result = await category_collection.update_one({"_id":ObjectId(id)},{"$set":category.dict()})
+    if result:
+        return JSONResponse(status_code=200,content={"_id":id, "name":category.name})
+    else:
+        raise HTTPException(status_code=404,detail=f"Category with id {id} not found")

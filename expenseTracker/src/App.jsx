@@ -60,6 +60,7 @@ function App() {
             <Route path="profile" element={<AdminProfile></AdminProfile>}></Route>
             <Route path="categories" element={<CategoryManager></CategoryManager>}></Route>
             <Route path="users" element={<Users></Users>}></Route>
+            <Route path="" element={<AdminDashboard></AdminDashboard>}></Route>
           </Route>
         </Route>
 
@@ -73,6 +74,7 @@ function App() {
             <Route path="expenses" element={<ExpenseList />} />
             <Route path="reports" element={<Reports />} />
             <Route path="budget-form" element={<BudgetForm />} />
+            <Route path="" element={<Dashboard />} />
           </Route>
         </Route>
       </Routes>

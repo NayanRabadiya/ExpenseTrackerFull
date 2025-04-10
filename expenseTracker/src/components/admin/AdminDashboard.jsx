@@ -1,119 +1,128 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Pie, Bar } from "react-chartjs-2";
+import "../styles/AdminDashboard.css";
+import { Card } from "@mui/material";
+
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  Chart as ChartJS,
+  ArcElement,
   Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
   Legend,
-} from "recharts";
-import "../styles/AdminDashboard.css"; // Import CSS file for styling
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+import axios from "axios";
+
+ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export const AdminDashboard = () => {
-  // Dummy data for statistics
-  const stats = {
-    totalUsers: 1245,
-    totalExpenses: "$15,320",
-    totalBudgets: 850,
-    highestCategory: "Shopping",
-    avgMonthlyExpense: "$450",
+  const [adminData, setAdminData] = useState({
+    noOfUsers: 0,
+    totalAmount: 0,
+    highestSpendingCategory: "-",
+    averageExpensePerUser: 0,
+    categoryAmount: {},
+  });
+
+  const getAdminData = async () => {
+    try {
+      const res = await axios.get("/admindata");
+      console.log(res.data);
+      setAdminData(res.data || {});
+    } catch (e) {
+      console.error("Error fetching admin data", e);
+    }
   };
 
-  // Dummy data for Bar Chart (Monthly Expenses)
-  const monthlyExpensesData = [
-    { month: "Jan", expenses: 500 },
-    { month: "Feb", expenses: 700 },
-    { month: "Mar", expenses: 450 },
-    { month: "Apr", expenses: 900 },
-    { month: "May", expenses: 650 },
-    { month: "Jun", expenses: 800 },
-  ];
-
-  // Dummy data for Pie Chart (Category Breakdown)
-  const categoryData = [
-    { name: "Food", value: 1200 },
-    { name: "Transport", value: 800 },
-    { name: "Shopping", value: 500 },
-    { name: "Rent", value: 2000 },
-    { name: "Utilities", value: 600 },
-  ];
+  useEffect(() => {
+    getAdminData();
+  }, []);
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A569BD"];
+  const chartLabels = Object.keys(adminData.categoryAmount || {});
+  const chartDataValues = Object.values(adminData.categoryAmount || {});
+
+  const pieData = {
+    labels: chartLabels,
+    datasets: [
+      {
+        data: chartDataValues,
+        backgroundColor: COLORS,
+      },
+    ],
+  };
+
+  const barData = {
+    labels: chartLabels,
+    datasets: [
+      {
+        label: "Categorywise Expenses",
+        data: chartDataValues,
+        backgroundColor: COLORS,
+      },
+    ],
+  };
+
+  const pieOptions = {
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
+  };
+
+  const barOptions = {
+    responsive: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+    },
+  };
 
   return (
     <div className="dashboard-container">
-      {/* Dashboard Title */}
       <h2 className="dashboard-title">Admin Dashboard</h2>
 
-      {/* Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Total Registered Users</h3>
-          <p>{stats.totalUsers}</p>
+          <p>{adminData.noOfUsers || 0}</p>
         </div>
         <div className="stat-card">
           <h3>Total Expenses This Month</h3>
-          <p>{stats.totalExpenses}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Total Budgets Created</h3>
-          <p>{stats.totalBudgets}</p>
+          <p>{adminData.totalAmount || 0}</p>
         </div>
         <div className="stat-card">
           <h3>Highest Expense Category</h3>
-          <p>{stats.highestCategory}</p>
+          <p>{adminData.highestSpendingCategory || "-"}</p>
         </div>
         <div className="stat-card">
           <h3>Average Monthly Expense/User</h3>
-          <p>{stats.avgMonthlyExpense}</p>
+          <p>{Number(adminData.averageExpensePerUser || 0).toFixed(2)}</p>
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="charts-container">
-        {/* Bar Chart - Monthly Expenses */}
-        <div className="chart-card">
-          <h3>Monthly Expenses Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyExpensesData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="expenses" fill="#007bff" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="chart-card">
+          <h3 className="chart-title">Spending Distribution by Category</h3>
+          {chartLabels.length ? (
+            <Pie data={pieData} options={pieOptions} />
+          ) : (
+            <p className="no-data">No data available</p>
+          )}
+        </Card>
 
-        {/* Pie Chart - Expense Breakdown by Category */}
-        <div className="chart-card">
-          <h3>Expense Breakdown by Category</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <Card className="chart-card">
+          <h3 className="chart-title">Categorywise Spending Trend</h3>
+          {chartLabels.length ? (
+            <Bar data={barData} options={barOptions} />) : (
+            <p className="no-data">No data available</p>
+          )}
+        </Card>
       </div>
     </div>
   );
 };
-
-

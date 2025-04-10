@@ -21,3 +21,8 @@ async def addCategory(cat:Category):
 @router.delete("/category/{id}")
 async def deleteCategoryById(id:str):
     return await CategoryController.deleteCategoryById(id)
+
+
+@router.put("/category/{id}")
+async def deleteCategoryById(id:str,cat:Category):
+    return await CategoryController.updateCategory(id, cat)
