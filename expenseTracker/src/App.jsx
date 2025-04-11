@@ -24,6 +24,7 @@ import { Users } from "./components/admin/Users";
 import { AdminNavBar } from "./components/admin/AdminNavbar";
 import { UserNavbar } from "./components/user/UserNavbar";
 import { AdminLogin } from "./components/admin/AdminLogin";
+import { Errorpage } from "./components/common/ErrorPage";
 function App() {
 
   axios.defaults.baseURL = "http://localhost:8000";
@@ -76,6 +77,8 @@ function App() {
             <Route path="" element={<Dashboard />} />
           </Route>
         </Route>
+
+        <Route path="*" element={<Errorpage />} />
       </Routes>
 
     </div>
