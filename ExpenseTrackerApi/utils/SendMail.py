@@ -18,14 +18,13 @@ def send_email(to_email:str, subject:str, text:str,pdf_data:Optional[bytes]=None
     msg['From'] = SMTP_EMAIL
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(text, 'plain'))
+    msg.attach(MIMEText(text, 'html'))
     
     if pdf_data:
         attachment = MIMEApplication(pdf_data, _subtype="pdf")
         attachment.add_header('Content-Disposition', 'attachment', filename=filename)
         msg.attach(attachment)
     
-    print("all done")
     server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
     server.starttls()
     server.login(SMTP_EMAIL, SMTP_PASSWORD)

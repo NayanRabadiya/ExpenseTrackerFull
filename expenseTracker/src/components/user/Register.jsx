@@ -25,13 +25,10 @@ export const Register = () => {
       roleId: "67c7e9367afd6879270eb871"
     };
 
-    // console.log(regdata);
-
     const response = await toast.promise(axios.post("/user", regdata), {
       pending: "Registering your account...",
       success: "Registration successful! 🎉",
       error: {
-
 
         render({ data }) {
           return data.response.data?.message || data?.message || "Registration failed! Please try again.";

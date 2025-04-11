@@ -48,7 +48,6 @@ export const UserNavbar = () => {
           {/* Sidebar (for small screens) */}
           <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
             <ul>
-              {/* <li><Link className="link" to="/sample" onClick={() => setIsSidebarOpen(false)}>Sample</Link></li> */}
               <li><Link className="link" to="/user/dashboard" onClick={() => setIsSidebarOpen(false)}>Dashboard</Link></li>
               <li><Link className="link" to="/user/expenses" onClick={() => setIsSidebarOpen(false)}>Expenses</Link></li>
               <li><Link className="link" to="/user/reports" onClick={() => setIsSidebarOpen(false)}>Reports</Link></li>

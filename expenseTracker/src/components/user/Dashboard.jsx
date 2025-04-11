@@ -56,8 +56,6 @@ export const Dashboard = () => {
     }
   }
 
-
-
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
 
@@ -66,53 +64,36 @@ export const Dashboard = () => {
     return month  == currentMonth && year == currentYear;
   });
 
-  // console.log("Current month Expenses:",currentMonthExpenses);
 
   currentMonthExpenses.sort((a, b) => {
-    const dateA = a.date.split("/").reverse().join("-"); // Convert dd/mm/yyyy → yyyy-mm-dd
+    const dateA = a.date.split("/").reverse().join("-"); 
     const dateB = b.date.split("/").reverse().join("-");
-    return new Date(dateB) - new Date(dateA); // Descending order (latest first)
+    return new Date(dateB) - new Date(dateA); // Descending order 
   });
 
-
-  // Calculate total budget, expense, and remaining
   const totalExpense = currentMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
   const remaining = totalBudget - totalExpense;
 
-
-  //  Calculate total spending per category
   const categoryTotals = {};
-
   currentMonthExpenses.forEach(expense => {
     const categoryName = expense.category.name;
     categoryTotals[categoryName] = (categoryTotals[categoryName] || 0) + expense.amount;
   });
 
-  //  Sort categories by total spending (highest first)
   const sortedCategories = Object.entries(categoryTotals).sort(([, amountA], [, amountB]) => amountB - amountA); 
-
-  //  Get the top spending category
-  const topCategories = sortedCategories.slice(0, 3); // Get first 3 categories
-
-  // console.log("Sorted Categories:", sortedCategories);
-  // console.log("Top 3 Categories:", topCategories);
+  const topCategories = sortedCategories.slice(0, 3); 
 
 
-  const overspendingCategories = budgets
-    ?.map(({ categoryName, amount }) => {
+  const overspendingCategories = budgets?.map(({ categoryName, amount }) => {
       const spent = categoryTotals[categoryName] || 0; // Get total spent for this category
       return spent > amount ? [categoryName, spent, amount] : null; // Store only overspending
     })
     .filter(Boolean);
 
-  // console.log("Overspending Categories:", overspendingCategories);
 
   return (
     <div className="dashboard-container">
-      {/* Dashboard Title */}
       <h1 className="dashboard-title"> Expense Tracker Dashboard</h1>
-
-      {/* Summary Section */}
       <div className="summary-section">
         <div className="summary-card remaining">
           <h3>💰 Remaining Balance</h3>
@@ -130,10 +111,7 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Insights Section */}
       <div className="insights-section">
-
-        {/* Overspending Categories */}
         {overspendingCategories?.length > 0 && (
           <div className="overspending-section">
             <h3>⚠️ Overspending Categories</h3>
@@ -160,7 +138,6 @@ export const Dashboard = () => {
           </div>
         )}
 
-        {/* Top Spending Categories */}
         <div className="top-spending-section">
           <h3>📊 Top Spending Categories This Month</h3>
           
@@ -184,14 +161,12 @@ export const Dashboard = () => {
       </div>
 
 
-      {/* Navigation Buttons */}
       <div className="navigation-buttons">
         <button onClick={() => navigate("/user/expenses")} className="btn-nav">📜 View All Expenses</button>
         <button onClick={() => navigate("/user/add-expense")} className="btn-nav">➕ Add Expense</button>
         <button onClick={() => navigate("/user/reports")} className="btn-nav">📊 View Reports</button>
       </div>
 
-      {/* Recent Transactions */}
       <div className="recent-transactions">
         <h3>📃 Recent Expenses</h3>
         <table className="transactions-table">
@@ -215,7 +190,6 @@ export const Dashboard = () => {
           </tbody>
         </table>
       </div>
-
     </div>
   );
 };

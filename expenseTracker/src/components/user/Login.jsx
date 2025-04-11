@@ -16,8 +16,6 @@ export const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-
-        
         const response = await toast.promise(axios.post("/login/user", data), {
             pending: "Logging in...",
         success: "Login successful! 🎉",
@@ -27,9 +25,7 @@ export const Login = () => {
         }
         },
     });
-    
-    // console.log(response.data);
-    
+        
     if (response.status == 200 ) {
         localStorage.clear();
         localStorage.setItem("userData", JSON.stringify(response.data));

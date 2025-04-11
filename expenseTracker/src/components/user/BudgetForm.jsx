@@ -60,8 +60,6 @@ export const BudgetForm = () => {
       amount: data[`amount_${categoryId}`],
     }));
 
-    // console.log(localBudgets);
-
     toast.promise(
       (async () => {
         const savedBudgets = [];
@@ -92,9 +90,6 @@ export const BudgetForm = () => {
     );
   };
 
-
-
-  //still not ready
   const handleSaveEdit = async () => {
     if (editingBudget == null) return
 
@@ -106,10 +101,6 @@ export const BudgetForm = () => {
       userId: userId
 
     }
-    console.log("updated", updated);
-
-
-
     try {
       const response = await toast.promise(
         axios.put(`/budget/${editingBudget.id}`, updated),
@@ -119,21 +110,16 @@ export const BudgetForm = () => {
           error: "Failed to update budget! Please try again.",
         }
       );
-
-      console.log("res", response.data);
-
       const updatedList = localBudgets.map(bud =>
         bud.id === editingBudget.id ? { ...bud, ...response.data } : bud
       );
 
       const newTotalBudget = updatedList.reduce((total, budget) => total + budget.amount, 0);
 
-
       localStorage.setItem("budgets", JSON.stringify(updatedList));
       setLocalBudgets(updatedList);
       localStorage.setItem("total_Budget", newTotalBudget);
       setTotalBudget(newTotalBudget);
-
       setEditingBudget(null);
 
     } catch (error) {

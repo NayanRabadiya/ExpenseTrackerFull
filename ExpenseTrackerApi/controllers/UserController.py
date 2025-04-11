@@ -28,51 +28,7 @@ from fastapi import BackgroundTasks
 
 
 UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)  # ✅ Ensure upload directory exists
-
-
-async def addUserWithUrl(
-    name: str,
-    email: str,
-    password: str,
-    contact: str,
-    address: Optional[str],
-    roleId: str,
-    image: UploadFile,
-):
-
-    try:
-        # file_ext = image.filename.split(".")[-1]
-        # file_path = os.path.join(UPLOAD_DIR, f"{ObjectId()}.{file_ext}")
-
-        # with open(file_path, "wb") as buffer:
-        #     shutil.copyfileobj(image.file, buffer)
-
-        imageURL = await uploadImage(image.file)
-
-        if not imageURL:
-            raise HTTPException(status_code=500, detail="Image upload failed!")
-
-        user_data = {
-            "name": name,
-            "email": email,
-            "roleId": ObjectId(roleId),
-            "contact": contact,
-            "password": password,
-            "address": address,
-            "imgUrl": imageURL,
-        }
-
-        user_obj = User(**user_data)
-        print("...user", user_data)
-        return await addUser(user_obj)
-        # return {
-        #     "message": "User created successfully",
-        #     # "image_url": file_path
-        # }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 async def getAllUsers():
@@ -87,11 +43,7 @@ async def getAllUsers():
 async def addUser(user: User):
 
     checkEmail = await user_collection.find_one({"email": user.email})
-    # print(".......................................",type(checkEmail["roleId"]))
-    # print(".......................................",type(user.roleId))
-    if checkEmail is None or checkEmail["roleId"] != ObjectId(user.roleId):
-        print(".....new email")
-
+    if checkEmail is None:
         user.password = bcrypt.hashpw(
             user.password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
@@ -145,10 +97,8 @@ async def getUserByRoleId(roleId: str):
 
 async def loginUser(req: UserLogin):
     foundUser = await user_collection.find_one({"email": req.email})
-    print(".....user", foundUser)
     if foundUser is None:
         return JSONResponse(status_code=404, content={"message": "user not found"})
-    print("........password", type(foundUser["password"]))
     if "password" in foundUser and bcrypt.checkpw(
         req.password.encode(), foundUser["password"].encode()
     ):
@@ -163,15 +113,12 @@ async def loginAdmin(req: UserLogin):
     foundUser = await user_collection.find_one(
         {"email": req.email, "roleId": ObjectId("67c7e9207afd6879270eb870")}
     )
-    print(".....user", foundUser)
     if foundUser is None:
         return JSONResponse(status_code=404, content={"message": "user not found"})
-    print("........password", type(foundUser["password"]))
     if "password" in foundUser and bcrypt.checkpw(
         req.password.encode(), foundUser["password"].encode()
     ):
         foundUser = await getRoleData(foundUser)
-
         return JSONResponse(status_code=200, content=UserOut(**foundUser).dict())
     else:
         return JSONResponse(status_code=401, content={"message": "incorrect password"})
@@ -226,7 +173,6 @@ async def updateUserRole(id: str, user: User):
         result = await user_collection.update_one(
             {"_id": ObjectId(id)}, {"$set": {"roleId": ObjectId(user.roleId)}}
         )
-
         updatedUser = await user_collection.find_one({"_id": ObjectId(id)})
         updatedUser = await getRoleData(updatedUser)
 
@@ -294,15 +240,20 @@ async def getAdminData():
     }
 
 
-async def sendMail(userId:str, pdf: UploadFile, background_tasks: BackgroundTasks):
+async def sendMail(userId: str, pdf: UploadFile, background_tasks: BackgroundTasks):
     user = await user_collection.find_one({"_id": ObjectId(userId)})
     email = user["email"]
-    
+
     pdf_bytes = pdf.file.read()
-    
-    
-    background_tasks.add_task(send_email, to_email=email, subject="Expense Report",text="Here is your expense report", pdf_data=pdf_bytes)
-    
+
+    background_tasks.add_task(
+        send_email,
+        to_email=email,
+        subject="Expense Report",
+        text="Here is your expense report",
+        pdf_data=pdf_bytes,
+    )
+
     return JSONResponse(status_code=200, content={"message": "Email sent successfully"})
 
 
@@ -323,14 +274,17 @@ async def forgotPassword(data: ForgotPasswordReq):
 
     token = generate_token(data.email)
     resetLink = f"http://localhost:5173/resetpassword/{token}"
-    body = f"""
+    body = f"""\
     <html>
-    <body>
-        <h1>HELLO THIS IS RESET PASSWORD LINK EXPIRES IN 1 hour</h1>
-        <a href= "{resetLink}">RESET PASSWORD</a>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Password Reset Request</h2>
+        <p>You requested to reset your password. Click the link below to reset it. This link will expire in 1 hour.</p>
+        <a href="{resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+        <p>If you didn't request this, you can safely ignore this email.</p>
     </body>
     </html>
     """
+
     subject = "RESET PASSWORD"
     send_email(data.email, subject, body)
     return {"message": "reset link sent successfully"}
@@ -338,19 +292,13 @@ async def forgotPassword(data: ForgotPasswordReq):
 
 async def resetPassword(data: ResetPasswordReq):
     try:
-        payload = jwt.decode(
-            data.token, SECRET_KEY, algorithms="HS256"
-        )  # {"sub":"email...",exp:}
+        payload = jwt.decode(data.token, SECRET_KEY, algorithms="HS256")
         email = payload.get("sub")
         if not email:
             raise HTTPException(status_code=421, detail="token is not valid...")
 
-        hashed_password = bcrypt.hashpw(
-            data.password.encode("utf-8"), bcrypt.gensalt()
-        ).decode("utf-8")
-        await user_collection.update_one(
-            {"email": email}, {"$set": {"password": hashed_password}}
-        )
+        hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        await user_collection.update_one({"email": email}, {"$set": {"password": hashed_password}})
 
         return {"message": "password updated successfully"}
     except jwt.ExpiredSignatureError:
@@ -361,9 +309,7 @@ async def resetPassword(data: ResetPasswordReq):
 
 async def getRoleData(user):
     if "roleId" in user:
-        # print("........role id",user["roleId"])
         role = await role_collection.find_one({"_id": ObjectId(user["roleId"])})
-        # print("........role",role)
         user["role"] = {"name": role["name"]}
     else:
         user["role"] = None
@@ -375,7 +321,6 @@ async def getCategoryData(expense):
         category = await category_collection.find_one(
             {"_id": ObjectId(expense["categoryId"])}
         )
-
         expense["category"] = {"name": category["name"]}
     else:
         expense["category"] = None

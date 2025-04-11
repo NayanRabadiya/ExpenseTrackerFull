@@ -49,7 +49,6 @@ export const Profile = () => {
       formData.append("contact", userData.contact);
       formData.append("address", userData.address);
       formData.append("roleId", userData.roleId);
-      // formData.append("image", selectedFile);
 
       if (selectedFile) {
         formData.append("image", selectedFile);
@@ -70,12 +69,11 @@ export const Profile = () => {
       )
 
       console.log("Response:", res.data);
-      //  Check if API returns the new image URL
       if (res.data.imgUrl) {
-        setImage(res.data.imgUrl); // Update the displayed image
+        setImage(res.data.imgUrl); 
       }
-      setUserData((prev) => ({ ...prev, ...res.data })); // Update userData
-      localStorage.setItem("userData", JSON.stringify({ ...userData, ...res.data })); // Store updated data
+      setUserData((prev) => ({ ...prev, ...res.data })); 
+      localStorage.setItem("userData", JSON.stringify({ ...userData, ...res.data })); 
 
     } catch (error) {
       console.error("Error updating profile:", error);

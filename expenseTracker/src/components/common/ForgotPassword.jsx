@@ -37,7 +37,7 @@ export const ForgotPassword = () => {
             },{autoClose:10000});
 
             if (response.status == 200) {
-                navigate("/login/user/user");
+                navigate("/login/user");
             }
             
         } catch (error) {
@@ -62,8 +62,6 @@ export const ForgotPassword = () => {
                         <input type="submit" value="Reset Password" className="btn-forgot" />
                     </div>
                 </form>
-
-
             </div>
         </div>
     )

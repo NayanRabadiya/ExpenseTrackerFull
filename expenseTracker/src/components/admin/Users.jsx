@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Container,
-  Typography,
   TextField,
   Table,
   TableBody,
@@ -10,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
   Select,
   InputLabel,
   FormControl,
@@ -126,7 +123,6 @@ export const Users = () => {
 
   useEffect(() => {
     const loggedInUserId = localStorage.getItem("userid");
-    // Filter users based on search and role
     setfilteredUsers(
       users.filter(
         (user) =>
@@ -241,9 +237,6 @@ export const Users = () => {
                       </IconButton>
                     </TableCell>
                   </TableRow>)
-
-
-
               })}
               {filteredUsers.length == 0 && (
                 <TableRow>

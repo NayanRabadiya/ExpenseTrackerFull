@@ -22,9 +22,7 @@ export const ResetPassword = () => {
       token: token
     }
 
-
     try {
-
       const response = await toast.promise(axios.post("/resetpassword", obj), {
         pending: "resetting password...",
         success: "password reset! please login",
@@ -41,8 +39,6 @@ export const ResetPassword = () => {
     } catch (error) {
       console.error("password reset error:", error);
     }
-
-
   }
 
   const Validators = {
@@ -99,8 +95,6 @@ export const ResetPassword = () => {
             <input type="submit" value="Reset" className="btn-reset" />
           </div>
         </form>
-
-
       </div>
     </div>
   );

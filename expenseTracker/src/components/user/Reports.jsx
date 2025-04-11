@@ -117,23 +117,7 @@ export const Reports = () => {
     }],
   };
 
-  // const chartOptions = {
-  //   plugins: {
-  //     legend: { position: "bottom" },
-  //     datalabels: {
-  //       color: "#333",
-  //       anchor: "end",
-  //       align: "start",
-  //       offset: 4,
-  //       font: { weight: "bold" },
-  //       formatter: (value) => `₹${value}`,
-  //     },
-  //   },
-  //   responsive: true,
-  //   // maintainAspectRatio: false,
-  // };
-
-  const chartOptions = {
+    const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -171,7 +155,6 @@ export const Reports = () => {
 
 
   const handleViewPdf = () => {
-
     toast.promise(async () => {
       const input = document.getElementById("pdf-capture");
       input.classList.add("pdf-export");
@@ -201,11 +184,7 @@ export const Reports = () => {
       success: "PDF generated successfully",
       error: "Failed to generate PDF"
     });
-
-
   };
-
-
 
   const handleExportPDF = async () => {
     const input = document.getElementById("pdf-capture");

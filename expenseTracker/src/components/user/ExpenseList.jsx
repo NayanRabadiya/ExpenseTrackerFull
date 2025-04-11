@@ -31,33 +31,22 @@ export const ExpenseList = () => {
   const [categories, setCategories] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
 
-  useEffect(() => {
-    getCategories();
-    fetchExpenses();
-  }, []);
-
   const toDate = (date) => {
     if (date instanceof Date) return date;
-
     if (typeof date !== "string") return null;
-
     // Normalize delimiters
     const parts = date.includes("/") ? date.split("/") : date.includes("-") ? date.split("-") : [];
-
     if (parts.length == 3) {
       let day, month, year;
-
       if (date.includes("/")) {
         [day, month, year] = parts;
       } else if (date.includes("-")) {
-        // If format is yyyy-mm-dd
         if (parts[0].length == 4) {
           [year, month, day] = parts;
         } else {
           [day, month, year] = parts;
         }
       }
-
       return new Date(Number(year), Number(month) - 1, Number(day));
     }
     return null;
@@ -65,7 +54,6 @@ export const ExpenseList = () => {
 
 
   const toDDMMYYYY = (date) => {
-
     const parsed = toDate(date);
     if (!(parsed instanceof Date) || isNaN(parsed)) return "";
     return `${String(parsed.getDate()).padStart(2, "0")}/${String(parsed.getMonth() + 1).padStart(2, "0")}/${parsed.getFullYear()}`;
@@ -74,31 +62,15 @@ export const ExpenseList = () => {
   const toYYYYMMDD = (date) => {
     const parsed = toDate(date);
     if (!(parsed instanceof Date) || isNaN(parsed)) return "";
-
     return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
   };
 
 
   useEffect(() => {
-    let filtered = [...expensesData];
-    if (dateRange.start) filtered = filtered.filter(expense => toDate(expense.date) >= toDate(dateRange.start));
-    if (dateRange.end) filtered = filtered.filter(expense => toDate(expense.date) <= toDate(dateRange.end));
-    if (amountRange.min) filtered = filtered.filter(expense => expense.amount >= parseFloat(amountRange.min));
-    if (amountRange.max) filtered = filtered.filter(expense => expense.amount <= parseFloat(amountRange.max));
-    if (selectedCategories.length > 0) filtered = filtered.filter(expense => selectedCategories.includes(expense.category.name));
+    getCategories();
+    fetchExpenses();
+  }, []);
 
-    filtered.sort((a, b) => toDate(b.date) - toDate(a.date));
-    setFilteredExpenses(filtered);
-
-    if ((page - 1) * rowsPerPage >= filtered.length) {
-      setPage(1);
-    }
-
-  }, [dateRange, amountRange, selectedCategories, expensesData]);
-
-  useEffect(() => {
-    setPage(prev => Math.min(prev, Math.max(1, Math.ceil(filteredExpenses.length / rowsPerPage))));
-  }, [filteredExpenses, rowsPerPage]);
 
   const getCategories = async () => {
     const categoriesData = localStorage.getItem("categories");
@@ -124,6 +96,33 @@ export const ExpenseList = () => {
     }
   };
 
+
+
+  useEffect(() => {
+    let filtered = [...expensesData];
+    if (dateRange.start) filtered = filtered.filter(expense => toDate(expense.date) >= toDate(dateRange.start));
+    if (dateRange.end) filtered = filtered.filter(expense => toDate(expense.date) <= toDate(dateRange.end));
+    if (amountRange.min) filtered = filtered.filter(expense => expense.amount >= parseFloat(amountRange.min));
+    if (amountRange.max) filtered = filtered.filter(expense => expense.amount <= parseFloat(amountRange.max));
+    if (selectedCategories.length > 0) filtered = filtered.filter(expense => selectedCategories.includes(expense.category.name));
+
+    filtered.sort((a, b) => toDate(b.date) - toDate(a.date));
+    setFilteredExpenses(filtered);
+
+    if ((page - 1) * rowsPerPage >= filtered.length) {
+      setPage(1);
+    }
+
+  }, [dateRange, amountRange, selectedCategories, expensesData]);
+
+
+
+  useEffect(() => {
+    setPage(prev => Math.min(prev, Math.max(1, Math.ceil(filteredExpenses.length / rowsPerPage))));
+  }, [filteredExpenses, rowsPerPage]);
+
+
+
   const handleEditing = (expense) => {
     setEditingExpense(expense);
     setEditingId(expense._id);
@@ -134,12 +133,11 @@ export const ExpenseList = () => {
     setEditingId(null);
   }
 
-  const handleDeleteExpense = async (expenseId,title) => {
+  const handleDeleteExpense = async (expenseId, title) => {
 
     const confirm = await ConfirmToast(`Do you really want to delete ${title}?`)
     console.log("confirm", confirm);
     if (!confirm) return;
-
 
     const backupExpenses = [...filteredExpenses];
     const updatedExpenses = filteredExpenses.filter(expense => expense._id !== expenseId);
@@ -164,8 +162,6 @@ export const ExpenseList = () => {
 
   const handleSaveEdit = async (expenseId) => {
     if (editingExpense == null) return
-
-
     const updated = {
       amount: editingExpense.amount,
       date: editingExpense.date,
@@ -174,11 +170,6 @@ export const ExpenseList = () => {
       categoryId: editingExpense.categoryId,
       userId: editingExpense.userId
     }
-
-    console.log("updated", updated);
-
-
-
     try {
       // console.log("....data",data);
       const response = await toast.promise(
@@ -190,10 +181,6 @@ export const ExpenseList = () => {
         }
       )
 
-      // console.log("res",response.data);
-
-
-
       setExpensesData(prev =>
         prev.map(exp =>
           exp._id === expenseId
@@ -202,23 +189,16 @@ export const ExpenseList = () => {
         )
       );
 
-
-      const updatedList = expensesData.map(exp =>
-        exp._id == expenseId ? response.data : exp
-      )
-
+      const updatedList = expensesData.map(exp =>exp._id == expenseId ? response.data : exp)
       localStorage.setItem("expenses", JSON.stringify(updatedList));
       setEditingExpense(null);
       setEditingId(null);
-
     } catch (error) {
       console.error("Error saving expense:", error);
       setEditingExpense(null);
       setEditingId(null);
-
     }
   }
-
 
   return (
     <div className="expense-list-wrapper">
@@ -366,7 +346,7 @@ export const ExpenseList = () => {
                           <IconButton onClick={() => handleEditing(expense)} color="primary">
                             <Edit />
                           </IconButton>
-                          <IconButton onClick={() => handleDeleteExpense(expense._id,expense.title)}>
+                          <IconButton onClick={() => handleDeleteExpense(expense._id, expense.title)}>
                             <Delete color="error" />
                           </IconButton>
                         </TableCell>

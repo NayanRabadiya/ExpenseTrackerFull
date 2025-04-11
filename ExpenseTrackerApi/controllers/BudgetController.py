@@ -85,11 +85,6 @@ async def updateBudget(id: str, budget: Budget):
         raise HTTPException(status_code=500, detail=f"Error updating Budget: {str(e)}")
 
 
-    
-    
-    
-    
-
 
 
 async def getUserData(budget):

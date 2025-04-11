@@ -130,9 +130,6 @@ export const CategoryManager = () => {
                   categories.map((category) => {
                     return editingCategory?._id == category._id ? (
                       <TableRow key={category._id} className="editing-row">
-                        {/* <TableCell>{category.name}</TableCell>
-                         */}
-
                         <TableCell>
                           <TextField
                             label="Name"
@@ -166,7 +163,6 @@ export const CategoryManager = () => {
                         </TableCell>
                       </TableRow>
                     )
-
                   }
                   )
                 )}

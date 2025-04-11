@@ -42,9 +42,6 @@ function App() {
         theme="dark"
         transition={Bounce}
       />
-
-
-
       <Routes>
         {/* <Route path="/login/admin" element={<Login></Login>} /> */}
         <Route path="/" element={<Home></Home>} />
