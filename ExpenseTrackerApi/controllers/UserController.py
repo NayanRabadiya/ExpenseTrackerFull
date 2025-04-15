@@ -77,6 +77,8 @@ async def getUserById(id: str):
 async def deleteUserById(id: str):
     user = await user_collection.delete_one({"_id": ObjectId(id)})
     if user.deleted_count == 1:
+        await expenses_collection.delete_many({"userId": ObjectId(id)})
+        await budget_collection.delete_many({"userId": ObjectId(id)})
         return {"message": "User deleted successfully"}
     else:
         raise HTTPException(
@@ -297,8 +299,12 @@ async def resetPassword(data: ResetPasswordReq):
         if not email:
             raise HTTPException(status_code=421, detail="token is not valid...")
 
-        hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-        await user_collection.update_one({"email": email}, {"$set": {"password": hashed_password}})
+        hashed_password = bcrypt.hashpw(
+            data.password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
+        await user_collection.update_one(
+            {"email": email}, {"$set": {"password": hashed_password}}
+        )
 
         return {"message": "password updated successfully"}
     except jwt.ExpiredSignatureError:

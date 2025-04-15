@@ -1,5 +1,5 @@
 from models.RoleModel import Role,RoleOut
-from config.database import role_collection
+from config.database import role_collection,user_collection
 from bson import ObjectId
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -29,6 +29,7 @@ async def getRoleById(id:str):
 async def deleteRoleById(id:str):
     role = await role_collection.delete_one({"_id":ObjectId(id)})
     if role.deleted_count == 1:
+        await user_collection.delete_many({"roleId":ObjectId(id)})
         return {"message":"Role deleted successfully"}
     else:
         raise HTTPException(status_code=404,detail=f"Role with id {id} not found")
