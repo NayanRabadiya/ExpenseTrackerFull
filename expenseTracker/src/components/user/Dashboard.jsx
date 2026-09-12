@@ -1,7 +1,7 @@
 // User dashboard: budget vs spend summary, loaded on mount and cached
 // in localStorage so other pages can reuse it.
 import { useNavigate } from "react-router-dom";
-import "../styles/dashboard.css";
+import "../styles/Dashboard.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
