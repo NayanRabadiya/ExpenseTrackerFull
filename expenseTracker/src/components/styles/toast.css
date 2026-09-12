@@ -1,0 +1,126 @@
+/* Prevent scroll when confirm toast is active */
+body.freeze-ui {
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* 🔥 Outer Toastify toast container override */
+.override-confirm-toast {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  z-index: 1050 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 🔥 Body wrapper inside Toastify */
+.confirm-toast-body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
+/* 🔥 Your full-screen overlay */
+.confirm-toast-overlay {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1051;
+  pointer-events: auto;
+  outline: none;
+}
+
+.confirm-toast-overlay:focus {
+  outline: none;
+}
+
+/* 🔥 The white confirmation box */
+.confirm-toast-wrapper {
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  padding: 20px;
+  width: 20rem;
+  max-width: 90vw;
+  text-align: center;
+  z-index: 1052;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Buttons layout */
+.confirm-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 1rem;
+}
+
+.confirm-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-btn.yes {
+  background-color: #00897b;
+  color: white;
+}
+
+.confirm-btn.yes:hover {
+  background-color: #00695c;
+  transform: scale(1.05);
+}
+
+.confirm-btn.no {
+  background-color: #f44336;
+  color: white;
+}
+
+.confirm-btn.no:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+/* ❌ Kill all animations globally from Toastify */
+.Toastify__toast--enter,
+.Toastify__toast--exit,
+.Toastify__toast--animate {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+button:focus-visible {
+  outline: 0.2rem solid #010d1a;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+
+
+
+  

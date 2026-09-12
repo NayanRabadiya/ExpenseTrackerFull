@@ -1,0 +1,19 @@
+/* Global Reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* For regular toast positioning */
+.toast-container {
+  top: 5rem;
+  border-radius: 8rem;
+}
+
+@media (max-width: 700px) {
+  .toast-container:not(.Toastify__toast-container) {
+    transform: translateX(-50%);
+  }
+
+}

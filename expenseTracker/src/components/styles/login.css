@@ -1,0 +1,110 @@
+.login-container {
+
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+  padding-top: 7rem;
+}
+
+.login-card {
+  height: max-content;
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.8rem rgba(0, 0, 0, 0.1);
+  width: 25rem;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  text-align: left;
+  font-weight: bold;
+  margin: 0.5rem 0 0.2rem;
+}
+
+.login-card input {
+  width: 94%;
+  padding: 0.8rem;
+  border-radius: 0.2rem;
+  font-size: 1rem;
+  border: 0.1rem solid #CCC;
+}
+
+
+.toggle-password {
+  position: absolute;
+  right: 0rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #555;
+}
+
+
+
+.btn-login {
+  border: none !important;
+  background-color: #00897b;
+  color: white;
+  margin: auto;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-login:hover {
+  background-color: #619791;
+
+}
+.register-link {
+  margin-top: 1rem;
+}
+.forgot-password-link{
+text-align: right;}
+/* Wrapper for the input field */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Input field with error: Red border */
+.input-error {
+  /* outline: none; */
+  border: 0.1rem solid red !important;
+  box-shadow: 0 0 0.1rem red;
+}
+
+/* Error message positioned on the border */
+.login-error-message {
+  position: absolute;
+  top: -0.8rem; /* Move it above the input */
+  left: 1rem ; /* Position it near the input */
+  background: white; /* Prevent overlapping */
+  color: red;
+  font-size: 1rem;
+  padding: 0 0.2rem;
+  font-weight: bold;
+}
+
+
+@media (max-width: 700px) {
+  .login-card {
+    width: 80%;
+    padding: 1.5rem;
+  }
+}
+
+
