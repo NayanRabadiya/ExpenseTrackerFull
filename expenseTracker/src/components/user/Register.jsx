@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import "../styles/register.css";
+import "../styles/Register.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { UserNavbar } from "./UserNavbar";
