@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "../styles/expenseForm.css";
+import "../styles/ExpenseForm.css";
 
 // Amount/date/title/category form for creating one expense.
 export const ExpenseForm = () => {

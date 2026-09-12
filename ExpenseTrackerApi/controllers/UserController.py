@@ -33,10 +33,6 @@ import jwt
 from fastapi import BackgroundTasks
 
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
 async def getAllUsers():
     """Return every user with their role name, or 404 when none exist."""
     users = await user_collection.find().to_list()

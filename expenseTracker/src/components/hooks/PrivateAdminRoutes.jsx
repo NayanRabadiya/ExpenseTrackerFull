@@ -14,7 +14,6 @@ const useAuth = () => {
     useEffect(() => {
         const id = localStorage.getItem("userid");
         const role = localStorage.getItem("role");
-        // Compared case-insensitively: the seeded role name is "admin".
         if (id && String(role || "").toLowerCase() == "admin") {
             setauth({ isLoggedin: true, role: role });
         }

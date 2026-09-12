@@ -19,10 +19,13 @@ from config.settings import CORS_ORIGIN
 
 app = FastAPI()
 
-# CORS Configuration — only the frontend origin from .env may call this API
+# CORS Configuration — only the frontend origins from .env may call this API.
+# Comma-separated so a deployed origin and localhost can be allowed at once.
+allowed_origins = [origin.strip() for origin in CORS_ORIGIN.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[CORS_ORIGIN],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,22 +59,28 @@ def backup_mongodb():
     os.system(f"mongodump --uri={MONGO_URL} --db={DATABASE_NAME} --out={backup_dir}")
     print(f"[{timestamp}] MongoDB backup completed.")
 
-# Scheduler Setup
-scheduler = BackgroundScheduler()
-scheduler.add_job(backup_mongodb, 'cron', hour=12, minute=0)  # Daily at 12:00 noon
-scheduler.start()
+# The backup job needs a long-lived process, a writable working directory and
+# `mongodump` on PATH — none of which a serverless host provides, so it is set up
+# only when running as a normal server. Vercel sets VERCEL=1 in every deployment.
+IS_SERVERLESS = bool(os.getenv("VERCEL"))
 
-# Graceful Shutdown
-@app.on_event("shutdown")
-def shutdown_event():
-    """Stop the scheduler so the process can exit cleanly."""
-    scheduler.shutdown()
+if not IS_SERVERLESS:
+    # Scheduler Setup
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(backup_mongodb, 'cron', hour=12, minute=0)  # Daily at 12:00 noon
+    scheduler.start()
 
-@app.on_event("startup")
-async def run_backup_on_startup():
-    """Take one backup as soon as the server boots."""
-    print("Server is starting... Running MongoDB backup.")
-    backup_mongodb()
+    # Graceful Shutdown
+    @app.on_event("shutdown")
+    def shutdown_event():
+        """Stop the scheduler so the process can exit cleanly."""
+        scheduler.shutdown()
+
+    @app.on_event("startup")
+    async def run_backup_on_startup():
+        """Take one backup as soon as the server boots."""
+        print("Server is starting... Running MongoDB backup.")
+        backup_mongodb()
 
 # Optional Root Endpoint
 @app.get("/")
