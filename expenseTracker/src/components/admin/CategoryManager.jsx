@@ -83,8 +83,8 @@ export const CategoryManager = () => {
       await toast.promise(
         axios.delete(`/category/${id}`), {
         pending: "Deleting category... ",
-        success: "Category added successfully! 🎉",
-        error: "Failed to add category! Please try again.",
+        success: "Category deleted successfully! 🎉",
+        error: "Failed to delete category! Please try again.",
       }
       )
       fetchCategories();

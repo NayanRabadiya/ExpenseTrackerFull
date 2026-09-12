@@ -87,3 +87,19 @@ if not IS_SERVERLESS:
 async def root():
     """Health check — confirms the API is up."""
     return {"message": "Expense Tracker API with MongoDB backup job running."}
+
+
+# TEMPORARY — delete once Vercel routing is confirmed working.
+# Registered last, so it only runs for requests no real route matched, and
+# reports what the ASGI app actually received instead of a bare 404.
+@app.api_route("/{unmatched_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def debug_unmatched(unmatched_path: str, request: Request):
+    """Echo the received path so a routing mismatch is visible from the browser."""
+    return {
+        "debug": "no route matched",
+        "received_path": request.url.path,
+        "root_path": request.scope.get("root_path"),
+        "registered_paths": sorted(
+            {route.path for route in app.routes if hasattr(route, "path")}
+        ),
+    }
