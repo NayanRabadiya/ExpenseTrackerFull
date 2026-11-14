@@ -72,6 +72,7 @@ npm run dev
 Serves at `http://localhost:5173` by default (Vite's default; `vite.config.js` sets no custom port or proxy).
 
 Other scripts:
+
 ```powershell
 npm run lint       # run ESLint
 npm run preview    # preview a production build locally

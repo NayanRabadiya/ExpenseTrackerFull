@@ -18,8 +18,6 @@ export const AdminLogin = () => {
   // Post the credentials, then save the login marker and open the dashboard.
   const onSubmit = async (data) => {
     try {
-
-
       const response = await toast.promise(axios.post("/login/admin", data), {
         pending: "Logging in...",
         success: "Login successful! 🎉",

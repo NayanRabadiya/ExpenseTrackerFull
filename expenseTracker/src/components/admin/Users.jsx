@@ -24,20 +24,22 @@ import { set } from "react-hook-form";
 import { toast } from "react-toastify";
 import { ConfirmToast } from "../common/ConfirmToast";
 // Paged, searchable user table with inline role editing.
+
+
 export const Users = () => {
   // Dummy User Data — sample rows kept for reference; not rendered.
-  const usersk = [
-    { _id: 1, name: "John Doe", email: "john@example.com", role: { name: "Admin" }, },
-    { _id: 2, name: "Jane Smith", email: "jane@example.com", role: { name: "User" }, },
-    { _id: 3, name: "Alice Johnson", email: "alice@example.com", role: { name: "User" }, },
-    { _id: 4, name: "Robert Brown", email: "robert@example.com", role: { name: "User" }, },
-    { _id: 5, name: "David Wilson", email: "david@example.com", role: { name: "Admin" }, },
-    { _id: 6, name: "John Doe", email: "john@example.com", role: { name: "Admin" }, },
-    { _id: 7, name: "Jane Smith", email: "jane@example.com", role: { name: "User" }, },
-    { _id: 8, name: "Alice Johnson", email: "alice@example.com", role: { name: "User" }, },
-    { _id: 9, name: "Robert Brown", email: "robert@example.com", role: { name: "User" }, },
-    { _id: 10, name: "David Wilson", email: "david@example.com", role: { name: "Admin" }, },
-  ];
+  // const usersk = [
+  //   { _id: 1, name: "John Doe", email: "john@example.com", role: { name: "Admin" }, },
+  //   { _id: 2, name: "Jane Smith", email: "jane@example.com", role: { name: "User" }, },
+  //   { _id: 3, name: "Alice Johnson", email: "alice@example.com", role: { name: "User" }, },
+  //   { _id: 4, name: "Robert Brown", email: "robert@example.com", role: { name: "User" }, },
+  //   { _id: 5, name: "David Wilson", email: "david@example.com", role: { name: "Admin" }, },
+  //   { _id: 6, name: "John Doe", email: "john@example.com", role: { name: "Admin" }, },
+  //   { _id: 7, name: "Jane Smith", email: "jane@example.com", role: { name: "User" }, },
+  //   { _id: 8, name: "Alice Johnson", email: "alice@example.com", role: { name: "User" }, },
+  //   { _id: 9, name: "Robert Brown", email: "robert@example.com", role: { name: "User" }, },
+  //   { _id: 10, name: "David Wilson", email: "david@example.com", role: { name: "Admin" }, },
+  // ];
 
   const [search, setSearch] = useState("");
   const [roles, setroles] = useState([]);
@@ -57,7 +59,7 @@ export const Users = () => {
   const fetchRoles = async () => {
     try {
       const response = await axios.get("/roles");
-      console.log(response.data);
+      // console.log(response.data);
       setroles(response.data);
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -77,13 +79,10 @@ export const Users = () => {
 
 
 
-
-
-
   // Save the user's new role and patch that row in place.
   const handleSaveEditingUser = async () => {
     try {
-      console.log("editingUser", editingUser);
+      // console.log("editingUser", editingUser);
 
       const res = await toast.promise(
         axios.put(`/user/role/${editingUser._id}`, editingUser), {

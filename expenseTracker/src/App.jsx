@@ -60,7 +60,7 @@ function App() {
         <Route path="/login/user" element={<Login></Login>} />
         <Route path="/login/admin" element={<AdminLogin></AdminLogin>} />
         <Route path="/register" element={<Register></Register>} />
-        <Route path="/sample" element={<AddSampleData></AddSampleData>} />
+        {/* <Route path="/sample" element={<AddSampleData></AddSampleData>} /> */}
         <Route path="/resetpassword/:token" element={<ResetPassword></ResetPassword>}></Route>
         <Route path="/forgotpassword" element={<ForgotPassword></ForgotPassword>}></Route>
 

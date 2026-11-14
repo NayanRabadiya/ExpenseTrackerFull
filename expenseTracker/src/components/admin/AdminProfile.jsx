@@ -43,7 +43,7 @@ export const AdminProfile = () => {
       return;
     }
     try {
-      console.log("userData", userData);
+      // console.log("userData", userData);
       const formData = new FormData();
 
       formData.append("name", userData.name);
@@ -56,9 +56,9 @@ export const AdminProfile = () => {
         formData.append("image", selectedFile);
       }
 
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(`${key}:`, value);
+      // }
 
 
       const res = await toast.promise(
@@ -70,7 +70,7 @@ export const AdminProfile = () => {
         }
       )
 
-      console.log("Response:", res.data);
+      // console.log("Response:", res.data);
       if (res.data.imgUrl) {
         setImage(res.data.imgUrl); 
       }

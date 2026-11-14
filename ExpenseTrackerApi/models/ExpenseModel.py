@@ -1,13 +1,11 @@
 """Request/response schemas for expenses (date is a "dd/mm/yyyy" string)."""
 
-from pydantic import BaseModel,Field,validator,ConfigDict
+from pydantic import BaseModel,Field,validator
 from typing import List,Optional,Dict,Any
 from bson import ObjectId
 
 # Incoming expense payload.
 class Expenses(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
     amount:float
     date:str
     description:Optional[str] = None
@@ -30,8 +28,6 @@ class Expenses(BaseModel):
 
 # Outgoing expense: adds the id and the joined category/user details.
 class ExpensesOut(Expenses):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
     id:str = Field(alias="_id")
     category:Optional[Dict[str,Any]] = None
     user:Optional[Dict[str,Any]] = None
