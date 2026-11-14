@@ -196,12 +196,13 @@ export const Reports = () => {
     input.classList.add("pdf-export");
     await new Promise(resolve => setTimeout(resolve, 200))
 
+    // Smaller scale + JPEG keeps the upload under Vercel's 4.5 MB request limit.
     const canvas = await html2canvas(input, {
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
     });
 
-    const imgData = canvas.toDataURL("image/png");
+    const imgData = canvas.toDataURL("image/jpeg", 0.8);
 
     const pdf = new jsPDF("p", "mm", "a4");
 
@@ -209,7 +210,7 @@ export const Reports = () => {
     const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
 
     // Stretch image to fill entire A4 page
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
     input.classList.remove("pdf-export"); // Remove fixed style
 
     const blob = pdf.output("blob");
