@@ -43,7 +43,7 @@ async def getAllUsers():
     return [UserOut(**user) for user in users]
 
 
-async def addUser(user: User):
+async def addUser(user: User, background_tasks: BackgroundTasks):
     """Register a user (bcrypt-hashing the password), rejecting a duplicate email."""
 
     checkEmail = await user_collection.find_one({"email": user.email})
@@ -53,9 +53,13 @@ async def addUser(user: User):
         ).decode("utf-8")
         user.roleId = ObjectId(user.roleId)
         saved = await user_collection.insert_one(user.dict())
-        user.roleId = str(user.roleId)
 
-        # send_email(user.email,"Account created successfully","Your account has been created successfully")
+        background_tasks.add_task(
+            send_email,
+            to_email=user.email,
+            subject="Account created successfully",
+            text="Your account has been created successfully",
+        )
 
     else:
         print(".....same email and role")
@@ -64,7 +68,8 @@ async def addUser(user: User):
         )
 
     if saved.inserted_id:
-        return JSONResponse(status_code=200, content=user.dict())
+        result = await getRoleData(user.dict())
+        return JSONResponse(status_code=200, content=UserOut(**result, _id=saved.inserted_id).dict())
     raise HTTPException(status_code=500, detail="User doesnot added..")
 
 
@@ -76,6 +81,7 @@ async def addUserWithUrl(
     address: Optional[str],
     roleId: str,
     image: UploadFile,
+    background_tasks: BackgroundTasks,
 ):
     """Register a user whose profile image is uploaded to Cloudinary first."""
 
@@ -107,6 +113,14 @@ async def addUserWithUrl(
 
     savedUser = await user_collection.find_one({"_id": saved.inserted_id})
     savedUser = await getRoleData(savedUser)
+
+    background_tasks.add_task(
+        send_email,
+        to_email=email,
+        subject="Account created successfully",
+        text="Your account has been created successfully",
+    )
+
     return JSONResponse(status_code=200, content=UserOut(**savedUser).dict())
 
 
@@ -161,8 +175,9 @@ async def loginUser(req: UserLogin):
 
 async def loginAdmin(req: UserLogin):
     """Same as loginUser, but only matches accounts holding the admin role id."""
+    adminRoleId = await getRoleIdByName("admin")
     foundUser = await user_collection.find_one(
-        {"email": req.email, "roleId": ObjectId("67c7e9207afd6879270eb870")}
+        {"email": req.email, "roleId": adminRoleId}
     )
     if foundUser is None:
         return JSONResponse(status_code=404, content={"message": "user not found"})
@@ -212,10 +227,9 @@ async def updateUser(
             {"_id": ObjectId(id)}, {"$set": user_data}
         )
 
-        updatedUser = await user_collection.find_one({"_id": ObjectId(id)})
-        updatedUser = await getRoleData(updatedUser)
+        updatedUser = await getRoleData(user_data)
 
-        return JSONResponse(status_code=200, content=UserOut(**updatedUser).dict())
+        return JSONResponse(status_code=200, content=UserOut(**updatedUser, _id=ObjectId(id)).dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
@@ -226,10 +240,9 @@ async def updateUserRole(id: str, user: User):
         result = await user_collection.update_one(
             {"_id": ObjectId(id)}, {"$set": {"roleId": ObjectId(user.roleId)}}
         )
-        updatedUser = await user_collection.find_one({"_id": ObjectId(id)})
-        updatedUser = await getRoleData(updatedUser)
+        updatedUser = await getRoleData(user.dict())
 
-        return JSONResponse(status_code=200, content=UserOut(**updatedUser).dict())
+        return JSONResponse(status_code=200, content=UserOut(**updatedUser, _id=ObjectId(id)).dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
@@ -240,8 +253,9 @@ async def getAdminData():
     Totals, per-category spend, the highest-spending category, and the average
     per standard user. Expenses whose date isn't "dd/mm/yyyy" are skipped.
     """
+    userRoleId = await getRoleIdByName("user")
     noOfUsers = await user_collection.count_documents(
-        {"roleId": ObjectId("67c7e9367afd6879270eb871")}
+        {"roleId": userRoleId}
     )
 
     expenses = await expenses_collection.find().to_list()
@@ -299,7 +313,7 @@ async def getAdminData():
     }
 
 
-async def sendMail(userId: str, pdf: UploadFile, background_tasks: BackgroundTasks):
+async def sendExpenseReportMail(userId: str, pdf: UploadFile, background_tasks: BackgroundTasks):
     """Queue the user's report PDF for emailing; returns before the send happens."""
     user = await user_collection.find_one({"_id": ObjectId(userId)})
     if not user:
@@ -380,6 +394,16 @@ async def resetPassword(data: ResetPasswordReq):
 
 
 # ---- helpers: attach related documents, imported by other controllers ----
+
+async def getRoleIdByName(name: str):
+    """Look up a role's _id by name (case-insensitive), e.g. "admin" or "user".
+
+    Avoids hardcoding a role's _id, which only matches a database seeded with
+    that exact id - see README's role-seeding steps.
+    """
+    role = await role_collection.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
+    return role["_id"] if role else None
+
 
 async def getRoleData(user):
     """Attach {"role": {"name": ...}} to a user; None if the role is gone."""

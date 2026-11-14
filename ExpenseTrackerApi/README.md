@@ -29,7 +29,7 @@ Each resource follows the same three-layer pattern: `routes/*.py` declares the H
 | Resource | Collection | Endpoints |
 |---|---|---|
 | Role | `roles` | `GET /roles`, `GET /role/{id}`, `POST /role`, `DELETE /role/{id}` |
-| User | `users` | `GET /users`, `GET /user/{id}`, `GET /user/role/{id}`, `POST /user`, `POST /user/url`, `PUT /user/{id}`, `PUT /user/role/{id}`, `DELETE /user/{id}`, `POST /sendmail/{userId}`, `POST /login/user`, `POST /login/admin`, `POST /forgotpassword`, `POST /resetpassword`, `GET /admindata` |
+| User | `users` | `GET /users`, `GET /user/{id}`, `GET /user/role/{id}`, `POST /user`, `POST /user/url`, `PUT /user/{id}`, `PUT /user/role/{id}`, `DELETE /user/{id}`, `POST /sendexpensereport/{userId}`, `POST /login/user`, `POST /login/admin`, `POST /forgotpassword`, `POST /resetpassword`, `GET /admindata` |
 | Category | `category` | `GET /categories`, `GET /category/{id}`, `POST /category`, `PUT /category/{id}`, `DELETE /category/{id}` |
 | Expense | `expenses` | `GET /expenses`, `GET /expenses/{id}`, `POST /expense`, `PUT /expense/{id}`, `DELETE /expense/{id}` |
 | Budget | `budget` | `GET /budgets`, `GET /budget/user/{id}`, `POST /budget`, `PUT /budget/{id}`, `DELETE /budget/{id}` |

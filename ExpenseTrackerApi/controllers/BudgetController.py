@@ -24,7 +24,7 @@ async def getAllBudgets():
         budgets[i] = await getUserData(budgets[i])
         budgets[i] = await getCategoryData(budgets[i])
 
-    return [BudgetOut(**budget).dict() for budget in budgets]
+    return [BudgetOut(**budget).dict() for budget in budgets] # status code defaults to 200, so no need to specify it here
 
 
 async def addBudget(budget: Budget):
@@ -34,7 +34,7 @@ async def addBudget(budget: Budget):
     )
 
     if existing_budget:
-        existing_budget["_id"] = str(existing_budget["_id"])  # Convert ObjectId to string
+        # existing_budget["_id"] = str(existing_budget["_id"])  # Convert ObjectId to string
         print(BudgetOut(**existing_budget).dict())
         raise HTTPException(status_code=400, detail={"message": "Budget already exists", "budget": BudgetOut(**existing_budget).dict()})
 
@@ -46,9 +46,7 @@ async def addBudget(budget: Budget):
 
     print("....saved",saved)
     if saved.inserted_id:
-        result  = await budget_collection.find_one({"_id": saved.inserted_id})
-
-        return JSONResponse(status_code=200, content=BudgetOut(**result).dict())
+        return JSONResponse(status_code=200, content=BudgetOut(**budget.dict(), _id=saved.inserted_id).dict())
 
     raise HTTPException(status_code=500, detail="Budget not added..")
 
@@ -87,8 +85,8 @@ async def updateBudget(id: str, budget: Budget):
         result = await budget_collection.update_one({"_id": ObjectId(id)}, {"$set": budget.dict()})
 
         updatedBudget = await budget_collection.find_one({"_id": ObjectId(id)})
-        updateBudget = await getCategoryData(updatedBudget)
-        updateBudget = await getUserData(updateBudget)
+        updatedBudget = await getCategoryData(updatedBudget)
+        updatedBudget = await getUserData(updatedBudget)
 
         return JSONResponse(status_code=200, content=BudgetOut(**updatedBudget).dict())
 

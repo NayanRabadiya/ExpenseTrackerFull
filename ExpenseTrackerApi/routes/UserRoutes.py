@@ -31,12 +31,13 @@ async def getUserByRoleId(id: str):
 
 
 @router.post("/user")
-async def addUser(user: User):
+async def addUser(user: User, background_tasks: BackgroundTasks):
     """Register a user from a JSON body (no profile image)."""
-    return await UserController.addUser(user)
+    return await UserController.addUser(user, background_tasks)
 
 @router.post("/user/url")
 async def addUserWithUrl(
+    background_tasks: BackgroundTasks,
     name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
@@ -47,7 +48,7 @@ async def addUserWithUrl(
 ):
     """Register a user from form data, uploading the profile image to Cloudinary."""
     return await UserController.addUserWithUrl(
-        name, email, password, contact, address, roleId, image
+        name, email, password, contact, address, roleId, image, background_tasks
     )
 
 @router.put("/user/{id}")
@@ -75,11 +76,11 @@ async def deleteUserById(id: str):
     """Delete a user, along with their expenses and budgets."""
     return await UserController.deleteUserById(id)
 
-@router.post("/sendmail/{userId}")
-async def sendMail(userId: str,background_tasks: BackgroundTasks, pdf: UploadFile = File(...)):
+@router.post("/sendexpensereport/{userId}")
+async def sendExpenseReportMail(userId: str,background_tasks: BackgroundTasks, pdf: UploadFile = File(...)):
     """Queue an emailed copy of the user's expense report PDF."""
     print("....sending mail")
-    return await UserController.sendMail(userId,pdf,background_tasks)
+    return await UserController.sendExpenseReportMail(userId,pdf,background_tasks)
 
 
 @router.post("/login/user")

@@ -11,8 +11,8 @@ async def addRole(role:Role):
     """Insert a new role."""
     saved = await role_collection.insert_one(role.dict())
 
-    if saved.acknowledged:
-        return JSONResponse(status_code=200,content=role.dict())
+    if saved.inserted_id:
+        return JSONResponse(status_code=200,content=RoleOut(**role.dict(), _id=saved.inserted_id).dict())
     raise HTTPException(status_code=500,detail="Role doesnot added..")
 
 

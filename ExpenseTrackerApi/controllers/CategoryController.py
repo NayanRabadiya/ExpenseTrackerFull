@@ -28,14 +28,21 @@ async def addCategory(category: Category):
     """Insert a new category."""
     saved = await category_collection.insert_one(category.dict())
     if saved.inserted_id:
-        return JSONResponse(status_code=200, content=category.dict())
+        return JSONResponse(status_code=200, content=CategoryOut(**category.dict(), _id=saved.inserted_id).dict())
     raise HTTPException(status_code=500, detail="Category doesnot added..")
 
 
 async def deleteCategoryById(id: str):
-    """Delete a category and cascade-delete its expenses and budgets."""
-    category = await category_collection.delete_one({"_id": ObjectId(id)})
+    """Delete a category and cascade-delete its expenses and budgets.
 
+    CAUTION: this permanently deletes every expense and budget tied to this
+    category, not just the category itself. There is no reassignment to a
+    default/misc category - the user's expense history under this category
+    is lost. Consider whether deletion should be blocked while the category
+    is still in use, or expenses/budgets reassigned first.
+    """
+    category = await category_collection.delete_one({"_id": ObjectId(id)})
+    
     if category.deleted_count == 1:
         await expenses_collection.delete_many({"categoryId": ObjectId(id)})
         await budget_collection.delete_many({"categoryId": ObjectId(id)})

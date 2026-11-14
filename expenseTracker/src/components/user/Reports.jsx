@@ -219,7 +219,7 @@ export const Reports = () => {
 
     try {
       const userId = localStorage.getItem("userid");
-      await toast.promise( axios.post(`/sendmail/${userId}`, formData, {
+      await toast.promise( axios.post(`/sendexpensereport/${userId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

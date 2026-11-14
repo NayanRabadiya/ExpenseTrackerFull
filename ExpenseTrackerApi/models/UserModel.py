@@ -28,8 +28,10 @@ class User(BaseModel):
 
 
 # Outgoing user: adds the id and the joined role name.
+# password is redeclared with exclude=True so the hash never leaves the server.
 class UserOut(User):
     id:str = Field(alias="_id")
+    password:Optional[str] = Field(default=None, exclude=True)
     role:Optional[Dict[str,Any]] = None
 
     @validator("id",pre=True,always=True)

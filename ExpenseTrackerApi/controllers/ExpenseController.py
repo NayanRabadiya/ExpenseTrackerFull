@@ -21,16 +21,16 @@ async def addExpense(expense:Expenses):
     expense.userId = ObjectId(expense.userId)
     expense.categoryId = ObjectId(expense.categoryId)
     saved = await expenses_collection.insert_one(expense.dict())
-    expense.userId = str(expense.userId)
-    expense.categoryId = str(expense.categoryId)
 
     if saved.inserted_id:
-        return JSONResponse(status_code=200,content=expense.dict())
+        result = await getCategoryData(expense.dict())
+        result = await getUserData(result)
+        return JSONResponse(status_code=200,content=ExpensesOut(**result, _id=saved.inserted_id).dict())
     return JSONResponse(status_code=500,content="Expense doesnot added..")
 
 async def getAllExpenses():
     """Return every expense with its category and user, or 404 when none exist."""
-    expenses = await expenses_collection.find().to_list()
+    expenses = await expenses_collection.find().to_list(1000)
 
     if len(expenses) == 0:
         # print("00000000000")
